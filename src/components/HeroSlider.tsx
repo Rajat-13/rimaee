@@ -77,15 +77,24 @@ const HeroSlider = () => {
 
             {/* Content */}
             <div className="relative h-full flex items-center justify-center text-center px-4">
-              <div className={`${index === currentSlide ? "animate-fade-in" : ""}`}>
-                <h2 className="heading-display text-charcoal mb-2">
+              <div className={`${index === currentSlide ? "animate-fade-in" : ""} max-w-3xl`}>
+                <span className="inline-block text-xs uppercase tracking-[0.4em] text-gold font-medium mb-6 border-b border-gold/30 pb-2">
+                  Exclusive Collection
+                </span>
+                <h2 className="font-serif text-5xl md:text-6xl lg:text-7xl font-medium tracking-tight text-charcoal mb-4 leading-[1.1]">
                   {slide.title}
                 </h2>
-                <p className="heading-subsection italic-accent text-charcoal/80 mb-8">
+                <p className="font-serif text-2xl md:text-3xl italic text-charcoal/70 mb-10 font-light">
                   {slide.subtitle}
                 </p>
-                <a href={slide.ctaLink} className="btn-primary inline-block">
+                <a 
+                  href={slide.ctaLink} 
+                  className="inline-flex items-center gap-3 bg-charcoal text-white px-10 py-4 text-sm font-medium uppercase tracking-[0.2em] transition-all duration-300 hover:bg-primary hover:shadow-xl group"
+                >
                   {slide.cta}
+                  <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
                 </a>
               </div>
             </div>
