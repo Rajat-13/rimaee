@@ -31,8 +31,8 @@ const CategorySection = () => {
       <div className="container-wide">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="heading-section">
-            Shop by <span className="italic-accent">Fragrance Type</span>
+          <h2 className="heading-section font-bold">
+            Shop by <em className="highlighted-text not-italic">Fragrance Type</em>
           </h2>
         </div>
 

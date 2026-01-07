@@ -15,8 +15,8 @@ const NewsletterSection = () => {
   return (
     <section className="section-padding gradient-burgundy">
       <div className="container-wide text-center">
-        <h2 className="heading-section text-primary-foreground mb-4">
-          Join the <span className="italic-accent">Fragrance Family</span>
+        <h2 className="heading-section font-bold text-primary-foreground mb-4">
+          Join the <em className="highlighted-text not-italic">Fragrance Family</em>
         </h2>
         <p className="text-body text-primary-foreground/80 mb-8 max-w-xl mx-auto">
           Subscribe to receive exclusive offers, early access to new launches, 
