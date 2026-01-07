@@ -13,13 +13,16 @@ const products: Record<string, {
   description: string;
   notes: { top: string[]; middle: string[]; base: string[] };
   images: string[];
-  sizes: { ml: number; price: number }[];
+  sizes: { ml: number; price: number; label: string }[];
   tag?: string;
+  gender: "for-him" | "for-her" | "unisex";
+  occasion: string;
+  concentration: { sillage: number; projection: number; longevity: number };
 }> = {
   "sandal-veer": {
     name: "Sandal Veer",
-    price: 799,
-    originalPrice: 999,
+    price: 1129,
+    originalPrice: 1499,
     description: "A bold and sophisticated fragrance that captures the essence of timeless elegance. Sandal Veer opens with warm sandalwood notes, complemented by subtle hints of musk and amber.",
     notes: {
       top: ["Bergamot", "Pink Pepper"],
@@ -32,11 +35,14 @@ const products: Record<string, {
       "https://images.unsplash.com/photo-1541643600914-78b084683601?w=800&auto=format&fit=crop&q=80",
     ],
     sizes: [
-      { ml: 10, price: 299 },
-      { ml: 50, price: 799 },
-      { ml: 100, price: 1299 },
+      { ml: 50, price: 1129, label: "50ml" },
+      { ml: 100, price: 1999, label: "100ml" },
+      { ml: 100, price: 2799, label: "100ml Personalized" },
     ],
-    tag: "Bestseller"
+    tag: "Bestseller",
+    gender: "unisex",
+    occasion: "All Day",
+    concentration: { sillage: 85, projection: 75, longevity: 90 }
   },
   "flora-bliss": {
     name: "Flora Bliss",
@@ -52,10 +58,13 @@ const products: Record<string, {
       "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=800&auto=format&fit=crop&q=80",
     ],
     sizes: [
-      { ml: 10, price: 349 },
-      { ml: 50, price: 899 },
-      { ml: 100, price: 1499 },
+      { ml: 50, price: 899, label: "50ml" },
+      { ml: 100, price: 1499, label: "100ml" },
+      { ml: 100, price: 2199, label: "100ml Personalized" },
     ],
+    gender: "for-her",
+    occasion: "Evening",
+    concentration: { sillage: 70, projection: 80, longevity: 85 }
   }
 };
 
@@ -161,8 +170,107 @@ const ProductDetail = () => {
                 {product.description}
               </p>
 
+              {/* Personality Section - Gender & Occasion */}
+              <div className="grid grid-cols-2 gap-4 py-4">
+                <div className="relative border-2 border-charcoal rounded-lg p-4">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-6 h-6 text-gold" viewBox="0 0 24 24" fill="currentColor">
+                      <circle cx="12" cy="5" r="3"/>
+                      <path d="M12 8v8M8 12h8M12 16v4"/>
+                      <path d="M9 20h6"/>
+                    </svg>
+                    <span className="font-bold text-lg capitalize">
+                      {product.gender === "unisex" ? "Unisex" : product.gender === "for-him" ? "For Him" : "For Her"}
+                    </span>
+                  </div>
+                </div>
+                <div className="relative border-2 border-charcoal rounded-lg p-4">
+                  <div className="flex items-center gap-2 justify-end">
+                    <span className="font-bold text-lg">{product.occasion}</span>
+                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="4"/>
+                      <path d="M12 2v2M12 20v2M2 12h2M20 12h2"/>
+                      <path d="M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Concentration Levels */}
+              <div className="space-y-4 py-4 border-y border-border">
+                <h3 className="font-medium uppercase tracking-wider text-sm">Concentration Levels</h3>
+                
+                {/* Sillage */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-charcoal text-primary-foreground px-4 py-2 rounded-full font-bold">
+                        Sillage
+                      </div>
+                      <span className="text-muted-foreground text-sm">the trail your perfume leaves behind</span>
+                    </div>
+                    <svg className="w-5 h-5 text-gold" viewBox="0 0 24 24" fill="currentColor">
+                      <ellipse cx="9" cy="18" rx="2" ry="3"/>
+                      <ellipse cx="15" cy="18" rx="2" ry="3"/>
+                    </svg>
+                  </div>
+                  <div className="h-3 bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-charcoal rounded-full transition-all duration-500"
+                      style={{ width: `${product.concentration.sillage}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Projection */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-charcoal text-primary-foreground px-4 py-2 rounded-full font-bold">
+                        Projection
+                      </div>
+                      <span className="text-muted-foreground text-sm">the reach of your scent</span>
+                    </div>
+                    <svg className="w-5 h-5 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="3"/>
+                      <path d="M12 5v-2M12 21v-2M5 12H3M21 12h-2"/>
+                      <path d="M7.05 7.05L5.636 5.636M18.364 18.364l-1.414-1.414M7.05 16.95l-1.414 1.414M18.364 5.636l-1.414 1.414"/>
+                    </svg>
+                  </div>
+                  <div className="h-3 bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-charcoal rounded-full transition-all duration-500"
+                      style={{ width: `${product.concentration.projection}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Longevity */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-charcoal text-primary-foreground px-4 py-2 rounded-full font-bold">
+                        Longevity
+                      </div>
+                      <span className="text-muted-foreground text-sm">how long your scent lasts</span>
+                    </div>
+                    <svg className="w-5 h-5 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="9"/>
+                      <path d="M12 6v6l4 2"/>
+                      <path d="M3.5 12H2M22 12h-1.5"/>
+                    </svg>
+                  </div>
+                  <div className="h-3 bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-charcoal rounded-full transition-all duration-500"
+                      style={{ width: `${product.concentration.longevity}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
               {/* Fragrance Notes */}
-              <div className="space-y-3 py-4 border-y border-border">
+              <div className="space-y-3 py-4 border-b border-border">
                 <h3 className="font-medium uppercase tracking-wider text-sm">Fragrance Notes</h3>
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div>
@@ -183,18 +291,18 @@ const ProductDetail = () => {
               {/* Size Selection */}
               <div className="space-y-3">
                 <h3 className="font-medium uppercase tracking-wider text-sm">Size</h3>
-                <div className="flex gap-3">
-                  {product.sizes.map((size) => (
+                <div className="flex flex-wrap gap-3">
+                  {product.sizes.map((size, index) => (
                     <button
-                      key={size.ml}
+                      key={index}
                       onClick={() => setSelectedSize(size)}
                       className={`px-5 py-3 border rounded-sm transition-all ${
-                        selectedSize.ml === size.ml
+                        selectedSize.label === size.label
                           ? "border-primary bg-primary text-primary-foreground"
                           : "border-border hover:border-primary"
                       }`}
                     >
-                      <span className="block font-medium">{size.ml}ml</span>
+                      <span className="block font-medium">{size.label}</span>
                       <span className="text-xs opacity-80">₹{size.price}</span>
                     </button>
                   ))}
