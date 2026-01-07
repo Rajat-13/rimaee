@@ -18,8 +18,8 @@ const CreateYourOwnSection = () => {
             <span className="text-sm uppercase tracking-[0.2em] text-gold font-medium">
               Personalization
             </span>
-            <h2 className="heading-section mt-4 mb-6">
-              Create <span className="italic-accent">Your Own</span> Bottle
+            <h2 className="heading-section font-bold mt-4 mb-6">
+              Create <em className="highlighted-text not-italic">Your Own</em> Bottle
             </h2>
             <p className="text-body text-muted-foreground mb-8 max-w-lg">
               Design a fragrance as unique as you are. Choose your notes, customize 
