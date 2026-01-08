@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Minus, Plus, Share2, Eye, ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronLeft, ChevronRight, Minus, Plus, Share2, Eye, ChevronDown, ChevronUp, Star, User } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MarqueeBanner from "@/components/MarqueeBanner";
 import intensityImg from "@/assets/intensity-reference.webp";
 import personalityImg from "@/assets/personality-reference.webp";
+import concentrationImg from "@/assets/concentration-comparison.jpg";
 
 // Sample product data - in real app this would come from API
 const products: Record<string, {
@@ -180,18 +181,22 @@ const ProductDetail = () => {
                 {product.name}
               </h1>
 
-              {/* Price */}
-              <div className="flex items-baseline gap-3 mb-2">
-                <span className="text-xl font-medium text-charcoal">Rs. {selectedSize.price.toLocaleString()}.00</span>
+              {/* Rating */}
+              <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`w-4 h-4 ${star <= 4 ? "fill-amber-400 text-amber-400" : "fill-amber-400/50 text-amber-400/50"}`}
+                    />
+                  ))}
+                </div>
+                <span className="text-sm text-muted-foreground">(4.5) 128 reviews</span>
               </div>
 
-              {/* EMI Info */}
-              <div className="text-sm text-muted-foreground mb-2">
-                or Pay ₹{Math.round(selectedSize.price / 3)} now & rest later at{" "}
-                <span className="text-charcoal font-medium cursor-pointer hover:underline">BUY ON EMI</span>
-              </div>
-              <div className="text-sm text-muted-foreground mb-4">
-                0% EMI on via <span className="font-medium">snapmint</span>
+              {/* Price */}
+              <div className="flex items-baseline gap-3 mb-4">
+                <span className="text-xl font-medium text-charcoal">Rs. {selectedSize.price.toLocaleString()}.00</span>
               </div>
 
               {/* Viewers Count */}
@@ -379,6 +384,141 @@ const ProductDetail = () => {
                     <Share2 className="w-4 h-4" />
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Concentration Comparison Section */}
+          <div className="mt-16 px-4 lg:px-0">
+            <div className="border-t border-border pt-12">
+              <h2 className="font-serif text-2xl md:text-3xl font-semibold text-charcoal text-center mb-4">
+                Why Choose RIMAÉ?
+              </h2>
+              <p className="text-center text-muted-foreground max-w-2xl mx-auto mb-8">
+                Our perfumes contain 35-40% oil concentration — the highest in the industry. 
+                Here's how we compare to other fragrance types:
+              </p>
+              
+              <div className="max-w-4xl mx-auto">
+                <img 
+                  src={concentrationImg} 
+                  alt="Perfume Concentration Comparison - EDT, EDP, Extrait de Parfum vs RIMAÉ" 
+                  className="w-full"
+                />
+              </div>
+
+              <div className="grid md:grid-cols-4 gap-6 mt-10 max-w-5xl mx-auto">
+                <div className="text-center p-4 border border-border rounded-lg">
+                  <h3 className="font-semibold text-charcoal mb-2">Eau de Cologne</h3>
+                  <p className="text-2xl font-bold text-muted-foreground mb-1">2-4%</p>
+                  <p className="text-sm text-muted-foreground">Oil Concentration</p>
+                  <p className="text-xs text-muted-foreground mt-2">Lasts 2-3 hours</p>
+                </div>
+                <div className="text-center p-4 border border-border rounded-lg">
+                  <h3 className="font-semibold text-charcoal mb-2">Eau de Toilette</h3>
+                  <p className="text-2xl font-bold text-muted-foreground mb-1">5-15%</p>
+                  <p className="text-sm text-muted-foreground">Oil Concentration</p>
+                  <p className="text-xs text-muted-foreground mt-2">Lasts 3-5 hours</p>
+                </div>
+                <div className="text-center p-4 border border-border rounded-lg">
+                  <h3 className="font-semibold text-charcoal mb-2">Eau de Parfum</h3>
+                  <p className="text-2xl font-bold text-muted-foreground mb-1">15-20%</p>
+                  <p className="text-sm text-muted-foreground">Oil Concentration</p>
+                  <p className="text-xs text-muted-foreground mt-2">Lasts 5-8 hours</p>
+                </div>
+                <div className="text-center p-4 border-2 border-primary rounded-lg bg-primary/5">
+                  <h3 className="font-semibold text-primary mb-2">RIMAÉ</h3>
+                  <p className="text-2xl font-bold text-primary mb-1">35-40%</p>
+                  <p className="text-sm text-charcoal">Oil Concentration</p>
+                  <p className="text-xs text-charcoal mt-2">Lasts 12-24 hours</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Customer Reviews Section */}
+          <div className="mt-16 px-4 lg:px-0">
+            <div className="border-t border-border pt-12">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+                <div>
+                  <h2 className="font-serif text-2xl md:text-3xl font-semibold text-charcoal mb-2">
+                    Customer Reviews
+                  </h2>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-0.5">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          className={`w-5 h-5 ${star <= 4 ? "fill-amber-400 text-amber-400" : "fill-amber-400/50 text-amber-400/50"}`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-muted-foreground">Based on 128 reviews</span>
+                  </div>
+                </div>
+                <button className="px-6 py-2.5 border border-charcoal text-charcoal text-sm font-medium uppercase tracking-wider hover:bg-charcoal hover:text-white transition-colors">
+                  Write a Review
+                </button>
+              </div>
+
+              {/* Reviews List */}
+              <div className="space-y-6">
+                {[
+                  {
+                    name: "Rahul S.",
+                    rating: 5,
+                    date: "2 weeks ago",
+                    title: "Amazing longevity!",
+                    review: "This fragrance lasts all day long. I get compliments everywhere I go. The sandalwood notes are perfectly balanced. Worth every penny!"
+                  },
+                  {
+                    name: "Priya M.",
+                    rating: 5,
+                    date: "1 month ago",
+                    title: "Best perfume I've ever used",
+                    review: "The concentration is incredible - just 2 sprays last the entire day. The projection is amazing and it smells so luxurious. Highly recommend!"
+                  },
+                  {
+                    name: "Amit K.",
+                    rating: 4,
+                    date: "1 month ago",
+                    title: "Great quality, unique scent",
+                    review: "Very unique fragrance profile. The oil concentration is noticeably higher than other brands. Sillage is excellent. Will definitely repurchase."
+                  }
+                ].map((review, index) => (
+                  <div key={index} className="border-b border-border pb-6">
+                    <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                        <User className="w-5 h-5 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+                          <div>
+                            <span className="font-medium text-charcoal">{review.name}</span>
+                            <span className="text-muted-foreground text-sm ml-2">• {review.date}</span>
+                          </div>
+                          <div className="flex items-center gap-0.5">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className={`w-4 h-4 ${star <= review.rating ? "fill-amber-400 text-amber-400" : "text-muted-foreground"}`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        <h4 className="font-medium text-charcoal mb-1">{review.title}</h4>
+                        <p className="text-muted-foreground text-sm">{review.review}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Load More Reviews */}
+              <div className="text-center mt-8">
+                <button className="text-sm font-medium text-charcoal underline hover:no-underline">
+                  Load More Reviews
+                </button>
               </div>
             </div>
           </div>
