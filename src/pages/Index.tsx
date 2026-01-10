@@ -6,6 +6,7 @@ import CategorySection from "@/components/CategorySection";
 import CreateYourOwnSection from "@/components/CreateYourOwnSection";
 import GenderSection from "@/components/GenderSection";
 import NewsletterSection from "@/components/NewsletterSection";
+import TrustBadges from "@/components/TrustBadges";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -20,6 +21,7 @@ const Index = () => {
         <CreateYourOwnSection />
         <GenderSection />
         <NewsletterSection />
+        <TrustBadges />
       </main>
       <Footer />
     </div>

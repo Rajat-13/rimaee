@@ -1,0 +1,448 @@
+import { useState, useMemo, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { SlidersHorizontal, ChevronDown, X, Heart } from "lucide-react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import TrustBadges from "@/components/TrustBadges";
+import { allProducts, categories, genderOptions, Product } from "@/data/products";
+import { useWishlist } from "@/context/WishlistContext";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+type SortOption = "featured" | "price-low" | "price-high" | "newest" | "bestseller";
+type ViewSection = "all" | "by-type" | "by-gender" | "bestseller" | "recently-viewed";
+
+const AllProducts = () => {
+  const { toggleItem, isInWishlist } = useWishlist();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedGender, setSelectedGender] = useState<string | null>(null);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
+  const [sortBy, setSortBy] = useState<SortOption>("featured");
+  const [viewSection, setViewSection] = useState<ViewSection>("all");
+  const [recentlyViewed, setRecentlyViewed] = useState<string[]>([]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  // Load recently viewed from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem("recentlyViewed");
+    if (stored) {
+      setRecentlyViewed(JSON.parse(stored));
+    }
+  }, []);
+
+  const filteredProducts = useMemo(() => {
+    let products = [...allProducts];
+
+    // Section filters
+    if (viewSection === "bestseller") {
+      products = products.filter((p) => p.tag === "Bestseller" || p.tag === "Premium");
+    } else if (viewSection === "recently-viewed") {
+      products = products.filter((p) => recentlyViewed.includes(p.id));
+    } else if (viewSection === "by-type" && selectedCategory) {
+      products = products.filter((p) => p.category === selectedCategory);
+    } else if (viewSection === "by-gender" && selectedGender) {
+      products = products.filter((p) => p.gender === selectedGender);
+    }
+
+    // Additional filters
+    if (selectedCategory && viewSection !== "by-type") {
+      products = products.filter((p) => p.category === selectedCategory);
+    }
+    if (selectedGender && viewSection !== "by-gender") {
+      products = products.filter((p) => p.gender === selectedGender);
+    }
+    products = products.filter(
+      (p) => p.price >= priceRange[0] && p.price <= priceRange[1]
+    );
+
+    // Sorting
+    switch (sortBy) {
+      case "price-low":
+        products.sort((a, b) => a.price - b.price);
+        break;
+      case "price-high":
+        products.sort((a, b) => b.price - a.price);
+        break;
+      case "bestseller":
+        products.sort((a, b) => (b.tag === "Bestseller" ? 1 : 0) - (a.tag === "Bestseller" ? 1 : 0));
+        break;
+      default:
+        break;
+    }
+
+    return products;
+  }, [selectedCategory, selectedGender, priceRange, sortBy, viewSection, recentlyViewed]);
+
+  const clearFilters = () => {
+    setSelectedCategory(null);
+    setSelectedGender(null);
+    setPriceRange([0, 2000]);
+    setSortBy("featured");
+  };
+
+  const hasActiveFilters = selectedCategory || selectedGender || priceRange[0] > 0 || priceRange[1] < 2000;
+
+  const sortOptions: { value: SortOption; label: string }[] = [
+    { value: "featured", label: "Featured" },
+    { value: "price-low", label: "Price: Low to High" },
+    { value: "price-high", label: "Price: High to Low" },
+    { value: "bestseller", label: "Best Selling" },
+    { value: "newest", label: "Newest First" },
+  ];
+
+  const ProductGridItem = ({ product }: { product: Product }) => {
+    const isWishlisted = isInWishlist(product.id);
+
+    return (
+      <div className="group relative">
+        <Link to={`/products/${product.slug}`} className="block">
+          <div className="relative aspect-square overflow-hidden bg-muted">
+            <img
+              src={product.image}
+              alt={product.name}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            {product.tag && (
+              <span className="absolute top-3 left-3 bg-primary text-primary-foreground text-xs uppercase tracking-wider px-3 py-1">
+                {product.tag}
+              </span>
+            )}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                toggleItem({
+                  id: product.id,
+                  name: product.name,
+                  price: product.price,
+                  originalPrice: product.originalPrice,
+                  image: product.image,
+                  slug: product.slug,
+                });
+              }}
+              className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 ${
+                isWishlisted
+                  ? "bg-red-500 text-white"
+                  : "bg-white/90 text-foreground hover:bg-white hover:text-red-500"
+              }`}
+            >
+              <Heart className={`w-4 h-4 ${isWishlisted ? "fill-current" : ""}`} />
+            </button>
+          </div>
+          <div className="p-4 text-center">
+            <h3 className="font-serif text-lg font-medium mb-2 group-hover:text-primary transition-colors">
+              {product.name}
+            </h3>
+            <div className="flex items-center justify-center gap-3">
+              <span className="text-lg font-medium">₹{product.price}</span>
+              {product.originalPrice && (
+                <span className="text-muted-foreground line-through text-sm">
+                  ₹{product.originalPrice}
+                </span>
+              )}
+            </div>
+          </div>
+        </Link>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main className="pt-20 md:pt-24">
+        <div className="container-wide px-4 py-8">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="font-serif text-3xl md:text-4xl font-semibold mb-4">
+              All Perfumes
+            </h1>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Explore our complete collection of handcrafted fragrances
+            </p>
+          </div>
+
+          {/* Section Tabs */}
+          <div className="flex flex-wrap justify-center gap-2 mb-8">
+            {[
+              { id: "all", label: "All" },
+              { id: "by-type", label: "By Type" },
+              { id: "by-gender", label: "By Gender" },
+              { id: "bestseller", label: "Bestsellers" },
+              { id: "recently-viewed", label: "Recently Viewed" },
+            ].map((section) => (
+              <button
+                key={section.id}
+                onClick={() => setViewSection(section.id as ViewSection)}
+                className={`px-4 py-2 text-sm font-medium rounded-full transition-all ${
+                  viewSection === section.id
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                }`}
+              >
+                {section.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Category/Gender Pills for By Type/By Gender views */}
+          {viewSection === "by-type" && (
+            <div className="flex flex-wrap justify-center gap-2 mb-8">
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
+                  className={`px-4 py-2 text-sm rounded-full border transition-all ${
+                    selectedCategory === cat.id
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border hover:border-primary"
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {viewSection === "by-gender" && (
+            <div className="flex flex-wrap justify-center gap-2 mb-8">
+              {genderOptions.map((gender) => (
+                <button
+                  key={gender.id}
+                  onClick={() => setSelectedGender(selectedGender === gender.id ? null : gender.id)}
+                  className={`px-4 py-2 text-sm rounded-full border transition-all ${
+                    selectedGender === gender.id
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border hover:border-primary"
+                  }`}
+                >
+                  {gender.name}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Filter Bar */}
+          <div className="flex items-center justify-between gap-4 mb-6 pb-4 border-b border-border">
+            <div className="flex items-center gap-4">
+              {/* Mobile Filter Button */}
+              <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+                <SheetTrigger asChild>
+                  <button className="md:hidden flex items-center gap-2 px-4 py-2 border border-border rounded-lg">
+                    <SlidersHorizontal className="w-4 h-4" />
+                    Filters
+                  </button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-80">
+                  <SheetHeader>
+                    <SheetTitle>Filters</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-6 space-y-6">
+                    {/* Category Filter */}
+                    <div>
+                      <h4 className="font-medium mb-3">Category</h4>
+                      <div className="space-y-2">
+                        {categories.map((cat) => (
+                          <button
+                            key={cat.id}
+                            onClick={() => {
+                              setSelectedCategory(selectedCategory === cat.id ? null : cat.id);
+                            }}
+                            className={`block w-full text-left px-3 py-2 rounded transition-colors ${
+                              selectedCategory === cat.id
+                                ? "bg-primary/10 text-primary"
+                                : "hover:bg-muted"
+                            }`}
+                          >
+                            {cat.name}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Gender Filter */}
+                    <div>
+                      <h4 className="font-medium mb-3">Gender</h4>
+                      <div className="space-y-2">
+                        {genderOptions.map((gender) => (
+                          <button
+                            key={gender.id}
+                            onClick={() => {
+                              setSelectedGender(selectedGender === gender.id ? null : gender.id);
+                            }}
+                            className={`block w-full text-left px-3 py-2 rounded transition-colors ${
+                              selectedGender === gender.id
+                                ? "bg-primary/10 text-primary"
+                                : "hover:bg-muted"
+                            }`}
+                          >
+                            {gender.name}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Price Range */}
+                    <div>
+                      <h4 className="font-medium mb-3">Price Range</h4>
+                      <div className="flex gap-2">
+                        <input
+                          type="number"
+                          value={priceRange[0]}
+                          onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                          className="w-full px-3 py-2 border border-border rounded text-sm"
+                          placeholder="Min"
+                        />
+                        <input
+                          type="number"
+                          value={priceRange[1]}
+                          onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                          className="w-full px-3 py-2 border border-border rounded text-sm"
+                          placeholder="Max"
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        clearFilters();
+                        setIsFilterOpen(false);
+                      }}
+                      className="w-full btn-primary"
+                    >
+                      Clear All Filters
+                    </button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+
+              {/* Desktop Filters */}
+              <div className="hidden md:flex items-center gap-3">
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-2 border border-border rounded-lg hover:border-primary transition-colors">
+                    Category
+                    <ChevronDown className="w-4 h-4" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-48">
+                    {categories.map((cat) => (
+                      <DropdownMenuItem
+                        key={cat.id}
+                        onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
+                        className={selectedCategory === cat.id ? "bg-primary/10" : ""}
+                      >
+                        {cat.name}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-2 border border-border rounded-lg hover:border-primary transition-colors">
+                    Gender
+                    <ChevronDown className="w-4 h-4" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-48">
+                    {genderOptions.map((gender) => (
+                      <DropdownMenuItem
+                        key={gender.id}
+                        onClick={() => setSelectedGender(selectedGender === gender.id ? null : gender.id)}
+                        className={selectedGender === gender.id ? "bg-primary/10" : ""}
+                      >
+                        {gender.name}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                {hasActiveFilters && (
+                  <button
+                    onClick={clearFilters}
+                    className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="w-4 h-4" />
+                    Clear
+                  </button>
+                )}
+              </div>
+
+              <span className="text-sm text-muted-foreground">
+                {filteredProducts.length} products
+              </span>
+            </div>
+
+            {/* Sort */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-2 border border-border rounded-lg hover:border-primary transition-colors">
+                Sort: {sortOptions.find((s) => s.value === sortBy)?.label}
+                <ChevronDown className="w-4 h-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                {sortOptions.map((option) => (
+                  <DropdownMenuItem
+                    key={option.value}
+                    onClick={() => setSortBy(option.value)}
+                    className={sortBy === option.value ? "bg-primary/10" : ""}
+                  >
+                    {option.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {/* Active Filters */}
+          {hasActiveFilters && (
+            <div className="flex flex-wrap gap-2 mb-6">
+              {selectedCategory && (
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary text-sm rounded-full">
+                  {categories.find((c) => c.id === selectedCategory)?.name}
+                  <button onClick={() => setSelectedCategory(null)}>
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {selectedGender && (
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary text-sm rounded-full">
+                  {genderOptions.find((g) => g.id === selectedGender)?.name}
+                  <button onClick={() => setSelectedGender(null)}>
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Product Grid */}
+          {filteredProducts.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {filteredProducts.map((product) => (
+                <ProductGridItem key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16">
+              <p className="text-muted-foreground mb-4">No products found matching your criteria</p>
+              <button onClick={clearFilters} className="btn-primary">
+                Clear Filters
+              </button>
+            </div>
+          )}
+        </div>
+        <TrustBadges />
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
+export default AllProducts;

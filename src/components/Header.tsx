@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, ShoppingBag, User, Search, ChevronDown } from "lucide-react";
+import { Menu, X, ShoppingBag, User, Search, ChevronDown, Heart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 import LoginDialog from "./LoginDialog";
 import SearchDrawer from "./SearchDrawer";
 import {
@@ -16,9 +17,11 @@ const Header = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { itemCount, setIsCartOpen } = useCart();
+  const { itemCount: wishlistCount, setIsWishlistOpen } = useWishlist();
 
   const navLinks = [
     { name: "Home", href: "/" },
+    { name: "All Perfumes", href: "/all-products" },
     { name: "Bestsellers", href: "/bestsellers" },
     { name: "Personalised", href: "/personalised" },
     { name: "My Type", href: "/my-type" },
@@ -83,13 +86,25 @@ const Header = () => {
           </nav>
 
           {/* Icons */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <button 
               className="p-2 hover:text-primary transition-colors" 
               aria-label="Search"
               onClick={() => setIsSearchOpen(true)}
             >
               <Search size={20} />
+            </button>
+            <button 
+              className="p-2 hover:text-primary transition-colors relative" 
+              aria-label="Wishlist"
+              onClick={() => setIsWishlistOpen(true)}
+            >
+              <Heart size={20} />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                  {wishlistCount}
+                </span>
+              )}
             </button>
             <button 
               className="p-2 hover:text-primary transition-colors" 

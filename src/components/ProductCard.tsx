@@ -1,10 +1,15 @@
+import { Link } from "react-router-dom";
+import { Heart } from "lucide-react";
+import { useWishlist } from "@/context/WishlistContext";
+
 interface Product {
-  id: number;
+  id: number | string;
   name: string;
   price: number;
   originalPrice?: number;
   image: string;
   tag?: string;
+  slug?: string;
 }
 
 interface ProductCardProps {
@@ -12,8 +17,30 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+  const { toggleItem, isInWishlist } = useWishlist();
+  
+  const slug = product.slug || product.name.toLowerCase().replace(/\s+/g, '-');
+  const productId = String(product.id);
+  const isWishlisted = isInWishlist(productId);
+
+  const handleWishlistClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleItem({
+      id: productId,
+      name: product.name,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      image: product.image,
+      slug: slug,
+    });
+  };
+
   return (
-    <div className="card-product group cursor-pointer min-w-[280px] md:min-w-[300px]">
+    <Link 
+      to={`/products/${slug}`}
+      className="card-product group cursor-pointer min-w-[280px] md:min-w-[300px] block"
+    >
       {/* Image Container */}
       <div className="relative aspect-square overflow-hidden bg-muted">
         <img
@@ -27,11 +54,24 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </span>
         )}
         
+        {/* Wishlist Button */}
+        <button
+          onClick={handleWishlistClick}
+          className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 ${
+            isWishlisted 
+              ? "bg-red-500 text-white" 
+              : "bg-white/90 text-foreground hover:bg-white hover:text-red-500"
+          }`}
+          aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+        >
+          <Heart className={`w-4 h-4 ${isWishlisted ? "fill-current" : ""}`} />
+        </button>
+        
         {/* Quick Add Overlay */}
         <div className="absolute inset-0 bg-background/0 group-hover:bg-background/10 transition-colors duration-300" />
-        <button className="absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 btn-primary text-xs">
-          Quick Add
-        </button>
+        <span className="absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 btn-primary text-xs pointer-events-none">
+          View Product
+        </span>
       </div>
 
       {/* Content */}
@@ -48,7 +88,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           )}
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
