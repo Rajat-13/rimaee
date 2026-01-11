@@ -3,25 +3,27 @@ import { ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { allProducts } from "@/data/products";
 
+const PERFUME_VIDEO_URL = "/videos/perfume-video.mp4";
+
 const shoppableVideos = [
   {
-    videoUrl: "https://videos.pexels.com/video-files/8447499/8447499-uhd_1440_2560_25fps.mp4",
+    videoUrl: PERFUME_VIDEO_URL,
     product: allProducts[0],
   },
   {
-    videoUrl: "https://videos.pexels.com/video-files/8447499/8447499-uhd_1440_2560_25fps.mp4",
+    videoUrl: PERFUME_VIDEO_URL,
     product: allProducts[1],
   },
   {
-    videoUrl: "https://videos.pexels.com/video-files/8447499/8447499-uhd_1440_2560_25fps.mp4",
+    videoUrl: PERFUME_VIDEO_URL,
     product: allProducts[2],
   },
   {
-    videoUrl: "https://videos.pexels.com/video-files/8447499/8447499-uhd_1440_2560_25fps.mp4",
+    videoUrl: PERFUME_VIDEO_URL,
     product: allProducts[3],
   },
   {
-    videoUrl: "https://videos.pexels.com/video-files/8447499/8447499-uhd_1440_2560_25fps.mp4",
+    videoUrl: PERFUME_VIDEO_URL,
     product: allProducts[4],
   },
 ];
