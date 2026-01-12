@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, ShoppingBag, User, Search, ChevronDown, Heart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import logoImg from "@/assets/logo.png";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,11 +19,11 @@ const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { itemCount, setIsCartOpen } = useCart();
   const { itemCount: wishlistCount, setIsWishlistOpen } = useWishlist();
+  const navigate = useNavigate();
 
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "All Perfumes", href: "/all-products" },
-    { name: "Bestsellers", href: "/bestsellers" },
     { name: "Personalised", href: "/personalised" },
     { name: "My Type", href: "/my-type" },
     { name: "Accessories", href: "/accessories" },
@@ -33,6 +34,13 @@ const Header = () => {
     { name: "FAQ", href: "/faq" },
     { name: "Privacy Policy", href: "/privacy-policy" },
   ];
+
+  const handleLoginDialogChange = (open: boolean, navigateTo?: string) => {
+    setIsLoginOpen(open);
+    if (navigateTo) {
+      navigate(navigateTo);
+    }
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
@@ -48,14 +56,17 @@ const Header = () => {
           </button>
 
           {/* Logo */}
-          <div className="flex-1 md:flex-none text-center md:text-left">
-            <Link to="/" className="inline-block">
-              <h1 className="font-serif text-2xl md:text-3xl font-semibold tracking-tight">
-                MYOP
-              </h1>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground -mt-1">
-                Make Your Own Perfume
-              </p>
+          <div className="flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3">
+            <Link to="/" className="flex items-center gap-3">
+              <img src={logoImg} alt="RIMAE Logo" className="h-10 md:h-12 w-auto" />
+              <div className="hidden sm:block text-left">
+                <p className="text-[10px] md:text-xs uppercase tracking-[0.15em] text-muted-foreground leading-tight">
+                  Perfume That
+                </p>
+                <p className="text-[10px] md:text-xs uppercase tracking-[0.15em] text-muted-foreground leading-tight">
+                  Understands You
+                </p>
+              </div>
             </Link>
           </div>
 
@@ -161,7 +172,7 @@ const Header = () => {
       </div>
 
       {/* Login Dialog */}
-      <LoginDialog open={isLoginOpen} onOpenChange={setIsLoginOpen} />
+      <LoginDialog open={isLoginOpen} onOpenChange={handleLoginDialogChange} />
       
       {/* Search Drawer */}
       <SearchDrawer open={isSearchOpen} onOpenChange={setIsSearchOpen} />

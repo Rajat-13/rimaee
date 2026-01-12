@@ -67,11 +67,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
           <Heart className={`w-4 h-4 ${isWishlisted ? "fill-current" : ""}`} />
         </button>
         
-        {/* Quick Add Overlay */}
+        {/* Hover Overlay */}
         <div className="absolute inset-0 bg-background/0 group-hover:bg-background/10 transition-colors duration-300" />
-        <span className="absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 btn-primary text-xs pointer-events-none">
-          View Product
-        </span>
       </div>
 
       {/* Content */}

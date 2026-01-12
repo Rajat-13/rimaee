@@ -97,14 +97,6 @@ const BestsellersSection = () => {
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
-
-        </div>
-
-        {/* Special Offer */}
-        <div className="mt-12 text-center">
-          <a href="#shop" className="btn-primary inline-block">
-            Buy 2 @ ₹999
-          </a>
         </div>
       </div>
     </section>

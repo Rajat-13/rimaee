@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -8,10 +9,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { ArrowLeft, Mail, Phone, User, Sparkles, Gift, CheckCircle2 } from "lucide-react";
+import logoImg from "@/assets/logo.png";
 
 interface LoginDialogProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange: (open: boolean, navigateTo?: string) => void;
 }
 
 type Step = "phone" | "phone-otp" | "profile" | "email-otp" | "success";
@@ -24,10 +26,17 @@ const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
   const [email, setEmail] = useState("");
   const [emailOtp, setEmailOtp] = useState("");
   const [notifyMe, setNotifyMe] = useState(true);
+  const navigate = useNavigate();
 
   const handlePhoneSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (phone.length >= 10) {
+      // Check for admin phone number
+      if (phone === "0000000000") {
+        resetAndClose();
+        navigate("/admin");
+        return;
+      }
       console.log("Sending OTP to:", phone);
       setStep("phone-otp");
     }
@@ -86,7 +95,7 @@ const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={resetAndClose}>
+    <Dialog open={open} onOpenChange={() => resetAndClose()}>
       <DialogContent className="p-0 gap-0 max-w-md overflow-hidden border-0 rounded-2xl shadow-2xl">
         {/* Beautiful Gradient Header */}
         <div className="relative bg-gradient-to-br from-rose-500 via-pink-500 to-orange-400 p-8 text-center text-white overflow-hidden">
@@ -108,14 +117,7 @@ const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
           <div className="relative z-10 space-y-4">
             {/* Logo */}
             <div className="flex items-center justify-center gap-3">
-              <div className="bg-white text-rose-500 font-bold text-sm px-3 py-2 rounded-lg shadow-lg">
-                <span className="block text-[10px] leading-tight">RI</span>
-                <span className="block text-[10px] leading-tight">MÉ</span>
-              </div>
-              <div className="text-left">
-                <p className="text-[10px] font-medium tracking-[0.2em] opacity-90">LUXURY</p>
-                <p className="text-[10px] font-medium tracking-[0.2em] opacity-90">PERFUMES</p>
-              </div>
+              <img src={logoImg} alt="RIMAE Logo" className="h-12 w-auto invert" />
             </div>
             
             {/* Promo Badge */}
@@ -126,10 +128,10 @@ const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
             
             {/* Main Headline */}
             <div>
-              <h2 className="text-3xl font-bold tracking-tight">Buy 2 Get 1 Free!</h2>
+              <h2 className="text-3xl font-bold tracking-tight">Welcome to RIMAE!</h2>
               <p className="text-white/90 text-sm mt-2 flex items-center justify-center gap-1">
                 <Sparkles className="w-4 h-4" />
-                Sign in now to claim your offer
+                Sign in to explore fragrances
               </p>
             </div>
           </div>
@@ -161,7 +163,7 @@ const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
               {step === "phone-otp" && "Verify Your Phone"}
               {step === "profile" && "Complete Your Profile"}
               {step === "email-otp" && "Verify Your Email"}
-              {step === "success" && "Welcome to RIMAÉ!"}
+              {step === "success" && "Welcome to RIMAE!"}
             </h3>
             <p className="text-muted-foreground text-sm mt-1">
               {step === "phone" && "We'll send you a verification code"}
@@ -348,7 +350,7 @@ const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
                   Welcome, <strong className="text-charcoal">{username}</strong>!
                 </p>
                 <p className="text-sm text-gray-500 mt-2">
-                  Your exclusive Buy 2 Get 1 Free offer is now unlocked.
+                  Your account has been created successfully.
                 </p>
               </div>
               <Button
@@ -370,7 +372,7 @@ const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-green-500">🔒</span>
-              <span>Secured by <strong className="text-gray-600">RIMAÉ</strong></span>
+              <span>Secured by <strong className="text-gray-600">RIMAE</strong></span>
             </div>
           </div>
         </div>

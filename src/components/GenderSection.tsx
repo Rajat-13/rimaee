@@ -1,22 +1,25 @@
 import { Link } from "react-router-dom";
+import forHimImg from "@/assets/for-him.png";
+import forHerImg from "@/assets/for-her.png";
+import unisexImg from "@/assets/unisex.png";
 
 const genders = [
   {
     id: 1,
     name: "For Him",
-    image: "https://images.unsplash.com/photo-1557862921-37829c790f19?w=800&auto=format&fit=crop&q=80",
+    image: forHimImg,
     slug: "for-him",
   },
   {
     id: 2,
     name: "For Her",
-    image: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=800&auto=format&fit=crop&q=80",
+    image: forHerImg,
     slug: "for-her",
   },
   {
     id: 3,
     name: "Unisex",
-    image: "https://images.unsplash.com/photo-1541643600914-78b084683601?w=800&auto=format&fit=crop&q=80",
+    image: unisexImg,
     slug: "unisex",
   },
 ];
@@ -37,7 +40,7 @@ const GenderSection = () => {
           {genders.map((gender) => (
             <Link
               key={gender.id}
-              to={`/products/sandal-veer`}
+              to={`/all-products?gender=${gender.slug}`}
               className="group relative aspect-[3/4] overflow-hidden rounded-sm"
             >
               <img

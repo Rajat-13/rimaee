@@ -1,29 +1,31 @@
+import { Link } from "react-router-dom";
 import { Instagram, Facebook, Twitter, Youtube } from "lucide-react";
+import logoImg from "@/assets/logo.png";
 
 const Footer = () => {
   const footerLinks = {
     shop: [
-      { name: "All Products", href: "#" },
-      { name: "Bestsellers", href: "#bestsellers" },
-      { name: "New Arrivals", href: "#" },
-      { name: "Gift Sets", href: "#" },
+      { name: "All Products", href: "/all-products" },
+      { name: "Bestsellers", href: "/bestsellers" },
+      { name: "New Arrivals", href: "/all-products" },
+      { name: "Gift Sets", href: "/accessories" },
     ],
     company: [
-      { name: "About Us", href: "#about" },
-      { name: "Our Story", href: "#" },
-      { name: "Sustainability", href: "#" },
-      { name: "Careers", href: "#" },
+      { name: "About Us", href: "/about-us" },
+      { name: "Our Story", href: "/about-us" },
+      { name: "Sustainability", href: "/about-us" },
+      { name: "Careers", href: "/about-us" },
     ],
     support: [
-      { name: "Contact Us", href: "#" },
-      { name: "FAQs", href: "#" },
-      { name: "Shipping", href: "#" },
-      { name: "Returns", href: "#" },
+      { name: "Contact Us", href: "/faq" },
+      { name: "FAQs", href: "/faq" },
+      { name: "Shipping", href: "/faq" },
+      { name: "Returns", href: "/faq" },
     ],
     legal: [
-      { name: "Privacy Policy", href: "#" },
-      { name: "Terms of Service", href: "#" },
-      { name: "Refund Policy", href: "#" },
+      { name: "Privacy Policy", href: "/privacy-policy" },
+      { name: "Terms of Service", href: "/privacy-policy" },
+      { name: "Refund Policy", href: "/privacy-policy" },
     ],
   };
 
@@ -41,9 +43,11 @@ const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <h3 className="font-serif text-2xl font-semibold mb-2">MYOP</h3>
+            <Link to="/" className="flex items-center gap-3 mb-4">
+              <img src={logoImg} alt="RIMAE Logo" className="h-12 w-auto invert" />
+            </Link>
             <p className="text-xs uppercase tracking-[0.15em] text-primary-foreground/60 mb-4">
-              Make Your Own Perfume
+              Perfume That Understands You
             </p>
             <p className="text-sm text-primary-foreground/70 leading-relaxed">
               Crafting personalized fragrances since 2020. Your scent, your story.
@@ -56,9 +60,9 @@ const Footer = () => {
             <ul className="space-y-2">
               {footerLinks.shop.map((link) => (
                 <li key={link.name}>
-                  <a href={link.href} className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
+                  <Link to={link.href} className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -70,9 +74,9 @@ const Footer = () => {
             <ul className="space-y-2">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
-                  <a href={link.href} className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
+                  <Link to={link.href} className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -84,9 +88,9 @@ const Footer = () => {
             <ul className="space-y-2">
               {footerLinks.support.map((link) => (
                 <li key={link.name}>
-                  <a href={link.href} className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
+                  <Link to={link.href} className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -98,9 +102,9 @@ const Footer = () => {
             <ul className="space-y-2">
               {footerLinks.legal.map((link) => (
                 <li key={link.name}>
-                  <a href={link.href} className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
+                  <Link to={link.href} className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -110,7 +114,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-primary-foreground/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-primary-foreground/60">
-            © 2024 MYOP. All rights reserved.
+            © 2024 RIMAE. All rights reserved.
           </p>
 
           {/* Social Links */}

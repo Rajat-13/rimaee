@@ -1,33 +1,25 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { allProducts } from "@/data/products";
+import heroSlide1 from "@/assets/hero-slide-1.png";
+import heroSlide2 from "@/assets/hero-slide-2.png";
 
 interface Slide {
   id: number;
-  product: typeof allProducts[0];
-  subtitle: string;
-  bgColor: string;
+  image: string;
+  link: string;
 }
 
 const slides: Slide[] = [
   {
     id: 1,
-    product: allProducts[0], // Sandal Veer
-    subtitle: "Introducing",
-    bgColor: "bg-gradient-to-br from-amber-100 via-orange-50 to-amber-200",
+    image: heroSlide1,
+    link: "/all-products",
   },
   {
     id: 2,
-    product: allProducts[1], // Flora Bliss
-    subtitle: "Discover",
-    bgColor: "bg-gradient-to-br from-pink-100 via-rose-50 to-pink-200",
-  },
-  {
-    id: 3,
-    product: allProducts[2], // Purple Mystique
-    subtitle: "Experience",
-    bgColor: "bg-gradient-to-br from-purple-100 via-violet-50 to-purple-200",
+    image: heroSlide2,
+    link: "/products/sandal-veer",
   },
 ];
 
@@ -46,7 +38,7 @@ const HeroSlider = () => {
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
 
   return (
-    <section className="relative mt-16 md:mt-20 overflow-hidden">
+    <section className="relative overflow-hidden">
       <div className="relative">
         {slides.map((slide, index) => (
           <div
@@ -56,61 +48,17 @@ const HeroSlider = () => {
             }`}
           >
             <Link 
-              to={`/products/${slide.product.slug}`}
-              className={`block ${slide.bgColor} min-h-[400px] md:min-h-[500px] lg:min-h-[600px]`}
+              to={slide.link}
+              className="block"
             >
-              <div className="container-wide h-full">
-                <div className="grid md:grid-cols-2 items-center h-full py-8 md:py-12 px-4 md:px-8">
-                  {/* Product Image - Left */}
-                  <div className="relative flex items-center justify-center order-1 md:order-1">
-                    {/* Decorative elements */}
-                    <div className="absolute -top-10 -left-10 w-20 h-20 md:w-32 md:h-32 bg-gradient-to-br from-amber-300/30 to-orange-200/20 rounded-full blur-2xl" />
-                    <div className="absolute -bottom-10 -right-10 w-24 h-24 md:w-40 md:h-40 bg-gradient-to-br from-pink-300/30 to-rose-200/20 rounded-full blur-2xl" />
-                    
-                    {/* Main product image */}
-                    <div className="relative z-10 transform hover:scale-105 transition-transform duration-500">
-                      <img
-                        src={slide.product.image}
-                        alt={slide.product.name}
-                        className="w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 object-cover rounded-lg shadow-2xl"
-                      />
-                      
-                      {/* Floating decorative icons */}
-                      <div className="absolute -top-4 -right-4 w-8 h-8 md:w-12 md:h-12 bg-white/80 rounded-full flex items-center justify-center shadow-lg">
-                        <span className="text-lg md:text-xl">✨</span>
-                      </div>
-                      <div className="absolute -bottom-4 -left-4 w-8 h-8 md:w-12 md:h-12 bg-white/80 rounded-full flex items-center justify-center shadow-lg">
-                        <span className="text-lg md:text-xl">🌸</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Content - Right */}
-                  <div className="text-center md:text-left order-2 md:order-2 mt-6 md:mt-0 md:pl-8 lg:pl-16">
-                    <span className="font-serif italic text-2xl md:text-3xl lg:text-4xl text-primary/80 block mb-2">
-                      {slide.subtitle}
-                    </span>
-                    <h1 className="font-serif text-4xl md:text-5xl lg:text-7xl font-bold text-charcoal leading-tight">
-                      {slide.product.name}
-                    </h1>
-                    <p className="mt-4 text-muted-foreground text-sm md:text-base max-w-md mx-auto md:mx-0">
-                      {slide.product.description}
-                    </p>
-                    <div className="mt-6 flex items-center gap-4 justify-center md:justify-start">
-                      <span className="text-2xl md:text-3xl font-semibold text-charcoal">
-                        ₹{slide.product.price.toLocaleString()}
-                      </span>
-                      {slide.product.originalPrice && (
-                        <span className="text-lg text-muted-foreground line-through">
-                          ₹{slide.product.originalPrice.toLocaleString()}
-                        </span>
-                      )}
-                    </div>
-                    <button className="mt-6 btn-primary rounded-md">
-                      Shop Now
-                    </button>
-                  </div>
-                </div>
+              {/* Image container - aspect ratio for different screen sizes */}
+              {/* Recommended dimensions: 1920x800 for desktop, 768x600 for mobile */}
+              <div className="w-full aspect-[4/3] md:aspect-[16/7] lg:aspect-[1920/800]">
+                <img
+                  src={slide.image}
+                  alt={`Slide ${slide.id}`}
+                  className="w-full h-full object-cover object-center"
+                />
               </div>
             </Link>
           </div>

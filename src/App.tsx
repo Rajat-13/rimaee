@@ -1,8 +1,9 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import Index from "./pages/Index";
@@ -16,12 +17,24 @@ import AllProducts from "./pages/AllProducts";
 import AboutUs from "./pages/AboutUs";
 import FAQ from "./pages/FAQ";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import CartDrawer from "./components/CartDrawer";
 import CheckoutDialog from "./components/CheckoutDialog";
 import WishlistDrawer from "./components/WishlistDrawer";
 
 const queryClient = new QueryClient();
+
+// Scroll to top on route change
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  
+  return null;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -31,6 +44,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <ScrollToTop />
             <CartDrawer />
             <CheckoutDialog />
             <WishlistDrawer />
@@ -46,6 +60,7 @@ const App = () => (
               <Route path="/about-us" element={<AboutUs />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/admin" element={<AdminDashboard />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
