@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Minus, Plus, Share2, Eye, ChevronDown, ChevronUp, Star, User } from "lucide-react";
+import { ChevronLeft, ChevronRight, Minus, Plus, Share2, Eye, ChevronDown, ChevronUp, Star, User, Heart } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MarqueeBanner from "@/components/MarqueeBanner";
@@ -8,6 +8,7 @@ import TrustBadges from "@/components/TrustBadges";
 import ReviewDialog from "@/components/ReviewDialog";
 import CustomerAlsoLove from "@/components/CustomerAlsoLove";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 import intensityImg from "@/assets/intensity-reference.webp";
 import personalityImg from "@/assets/personality-reference.webp";
 import concentrationImg from "@/assets/concentration-comparison.jpg";
@@ -82,6 +83,7 @@ const ProductDetail = () => {
   const { slug } = useParams();
   const product = products[slug || "sandal-veer"] || products["sandal-veer"];
   const { addItem, setIsCartOpen, setIsCheckoutOpen } = useCart();
+  const { toggleItem, isInWishlist } = useWishlist();
   
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
@@ -93,8 +95,31 @@ const ProductDetail = () => {
     personality: false,
   });
 
+  const isWishlisted = isInWishlist(slug || "sandal-veer");
+
+  // Auto slide product images
+  useEffect(() => {
+    if (product.images.length <= 1) return;
+    
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
+    }, 4000);
+    
+    return () => clearInterval(interval);
+  }, [product.images.length]);
+
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
+
+  const handleAddToWishlist = () => {
+    toggleItem({
+      id: slug || "sandal-veer",
+      name: product.name,
+      price: selectedSize.price,
+      image: product.images[0],
+      slug: slug || "sandal-veer",
+    });
   };
 
   const handleAddToCart = () => {
@@ -153,8 +178,20 @@ const ProductDetail = () => {
                 <img
                   src={product.images[currentImageIndex]}
                   alt={product.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-opacity duration-500"
                 />
+                
+                {/* Wishlist Button */}
+                <button
+                  onClick={handleAddToWishlist}
+                  className={`absolute top-3 right-3 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                    isWishlisted
+                      ? "bg-red-500 text-white"
+                      : "bg-white/90 text-foreground hover:bg-white hover:text-red-500"
+                  }`}
+                >
+                  <Heart className={`w-5 h-5 ${isWishlisted ? "fill-current" : ""}`} />
+                </button>
                 
                 {/* Navigation Arrows */}
                 {product.images.length > 1 && (
@@ -431,7 +468,7 @@ const ProductDetail = () => {
           <div className="mt-16 px-4 lg:px-8">
             <div className="border-t border-border pt-12">
               <h2 className="font-serif text-2xl md:text-3xl font-semibold text-charcoal text-center mb-4">
-                Why Choose RIMAÉ?
+                Why Choose RIMAE?
               </h2>
               <p className="text-center text-muted-foreground max-w-2xl mx-auto mb-8">
                 Our perfumes contain 35-40% oil concentration — the highest in the industry. 
@@ -441,7 +478,7 @@ const ProductDetail = () => {
               <div className="max-w-4xl mx-auto">
                 <img 
                   src={concentrationImg} 
-                  alt="Perfume Concentration Comparison - EDT, EDP, Extrait de Parfum vs RIMAÉ" 
+                  alt="Perfume Concentration Comparison - EDT, EDP, Extrait de Parfum vs RIMAE" 
                   className="w-full rounded-lg"
                 />
               </div>
@@ -466,7 +503,7 @@ const ProductDetail = () => {
                   <p className="text-xs text-muted-foreground mt-2">Lasts 5-8 hours</p>
                 </div>
                 <div className="text-center p-4 border-2 border-primary rounded-xl bg-primary/5">
-                  <h3 className="font-semibold text-primary mb-2">RIMAÉ</h3>
+                  <h3 className="font-semibold text-primary mb-2">RIMAE</h3>
                   <p className="text-2xl font-bold text-primary mb-1">35-40%</p>
                   <p className="text-sm text-charcoal">Oil Concentration</p>
                   <p className="text-xs text-charcoal mt-2">Lasts 12-24 hours</p>

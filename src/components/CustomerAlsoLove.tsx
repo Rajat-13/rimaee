@@ -49,7 +49,7 @@ const CustomerAlsoLove = ({ currentProductSlug }: CustomerAlsoLoveProps) => {
 
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-4 -mx-4 px-4"
+        className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4 -mx-4 px-4"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {relatedProducts.map((product) => (

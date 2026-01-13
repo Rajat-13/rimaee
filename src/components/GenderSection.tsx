@@ -41,6 +41,7 @@ const GenderSection = () => {
             <Link
               key={gender.id}
               to={`/all-products?gender=${gender.slug}`}
+              state={{ selectedGender: gender.slug }}
               className="group relative aspect-[3/4] overflow-hidden rounded-sm"
             >
               <img

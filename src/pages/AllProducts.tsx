@@ -1,11 +1,12 @@
 import { useState, useMemo, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams, useLocation } from "react-router-dom";
 import { SlidersHorizontal, ChevronDown, X, Heart } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TrustBadges from "@/components/TrustBadges";
 import { allProducts, categories, genderOptions, Product } from "@/data/products";
 import { useWishlist } from "@/context/WishlistContext";
+import MarqueeBanner from "@/components/MarqueeBanner";
 import {
   Sheet,
   SheetContent,
@@ -25,11 +26,21 @@ type ViewSection = "all" | "by-type" | "by-gender" | "bestseller" | "recently-vi
 
 const AllProducts = () => {
   const { toggleItem, isInWishlist } = useWishlist();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedGender, setSelectedGender] = useState<string | null>(null);
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
+  
+  // Get initial gender from URL params or location state
+  const genderFromUrl = searchParams.get('gender');
+  const categoryFromUrl = searchParams.get('category');
+  const genderFromState = (location.state as { selectedGender?: string })?.selectedGender;
+  
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(categoryFromUrl);
+  const [selectedGender, setSelectedGender] = useState<string | null>(genderFromUrl || genderFromState || null);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
   const [sortBy, setSortBy] = useState<SortOption>("featured");
-  const [viewSection, setViewSection] = useState<ViewSection>("all");
+  const [viewSection, setViewSection] = useState<ViewSection>(
+    genderFromUrl || genderFromState ? "by-gender" : categoryFromUrl ? "by-type" : "all"
+  );
   const [recentlyViewed, setRecentlyViewed] = useState<string[]>([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -40,6 +51,18 @@ const AllProducts = () => {
       setRecentlyViewed(JSON.parse(stored));
     }
   }, []);
+  
+  // Update filters when URL params change
+  useEffect(() => {
+    if (genderFromUrl) {
+      setSelectedGender(genderFromUrl);
+      setViewSection("by-gender");
+    }
+    if (categoryFromUrl) {
+      setSelectedCategory(categoryFromUrl);
+      setViewSection("by-type");
+    }
+  }, [genderFromUrl, categoryFromUrl]);
 
   const filteredProducts = useMemo(() => {
     let products = [...allProducts];
@@ -159,8 +182,9 @@ const AllProducts = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <MarqueeBanner />
       <Header />
-      <main className="pt-20 md:pt-24">
+      <main className="pt-32 md:pt-40">
         <div className="container-wide px-4 py-8">
           {/* Header */}
           <div className="text-center mb-8">

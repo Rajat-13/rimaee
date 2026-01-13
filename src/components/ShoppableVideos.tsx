@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import { allProducts } from "@/data/products";
 
@@ -17,14 +18,6 @@ const shoppableVideos = [
   {
     videoUrl: PERFUME_VIDEO_URL,
     product: allProducts[2],
-  },
-  {
-    videoUrl: PERFUME_VIDEO_URL,
-    product: allProducts[3],
-  },
-  {
-    videoUrl: PERFUME_VIDEO_URL,
-    product: allProducts[4],
   },
 ];
 
@@ -55,76 +48,53 @@ const ShoppableVideos = () => {
   };
 
   return (
-    <section className="section-padding bg-background">
+    <section className="section-padding bg-muted">
       <div className="container-wide">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-bold text-charcoal tracking-wide">
-            SHOPPABLE <span className="text-primary">VIDEOS</span>
+        {/* Header - Same style as Shop by Gender */}
+        <div className="text-center mb-12">
+          <h2 className="heading-section font-bold">
+            Shoppable <em className="highlighted-text not-italic">Videos</em>
           </h2>
-          <div className="w-24 h-0.5 bg-primary mx-auto mt-3 rounded-full" />
         </div>
 
-        {/* Videos Carousel */}
-        <div className="relative">
-          <button
-            onClick={() => scroll("left")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white shadow-lg rounded-full flex items-center justify-center hover:bg-muted transition-colors -translate-x-4"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-
-          <div
-            ref={scrollRef}
-            className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-          >
-            {shoppableVideos.map((item, index) => (
-              <div key={index} className="flex-shrink-0 w-[220px] md:w-[240px]">
-                {/* Video Container */}
-                <div className="aspect-[9/16] rounded-2xl overflow-hidden mb-3 relative bg-charcoal">
-                  <video
-                    src={item.videoUrl}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-
-                {/* Product Info Card */}
-                <div className="bg-white border border-border rounded-lg p-3 flex items-center gap-3">
-                  <img
-                    src={item.product.image}
-                    alt={item.product.name}
-                    className="w-12 h-12 object-cover rounded"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-medium text-charcoal truncate">
-                      {item.product.name}
-                    </h4>
-                    <p className="text-sm font-bold text-charcoal">
-                      ₹{item.product.price.toLocaleString()}
-                    </p>
+        {/* Gender-style Grid for Videos */}
+        <div className="grid md:grid-cols-3 gap-6">
+          {shoppableVideos.map((item, index) => (
+            <div key={index} className="group relative">
+              {/* Video Container - Gender style aspect ratio */}
+              <div className="relative aspect-[3/4] overflow-hidden rounded-sm">
+                <video
+                  src={item.videoUrl}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-charcoal/20 group-hover:bg-charcoal/10 transition-colors duration-300" />
+                
+                {/* Product Info Overlay */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-charcoal/80 to-transparent">
+                  <div className="flex items-end justify-between">
+                    <Link to={`/products/${item.product.slug}`} className="flex-1">
+                      <h3 className="font-serif text-lg font-medium text-primary-foreground">
+                        {item.product.name}
+                      </h3>
+                      <p className="text-primary-foreground/80 text-sm">
+                        ₹{item.product.price.toLocaleString()}
+                      </p>
+                    </Link>
+                    <button
+                      onClick={() => handleAddToCart(item.product)}
+                      className="w-10 h-10 flex items-center justify-center bg-white rounded-full hover:bg-primary hover:text-white transition-colors"
+                    >
+                      <ShoppingCart className="w-4 h-4" />
+                    </button>
                   </div>
-                  <button
-                    onClick={() => handleAddToCart(item.product)}
-                    className="w-9 h-9 flex items-center justify-center border border-border rounded-lg hover:bg-muted transition-colors"
-                  >
-                    <ShoppingCart className="w-4 h-4" />
-                  </button>
                 </div>
               </div>
-            ))}
-          </div>
-
-          <button
-            onClick={() => scroll("right")}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white shadow-lg rounded-full flex items-center justify-center hover:bg-muted transition-colors translate-x-4"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
+            </div>
+          ))}
         </div>
       </div>
     </section>
