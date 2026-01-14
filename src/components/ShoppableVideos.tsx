@@ -1,10 +1,20 @@
 import { useRef } from "react";
 import { ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
-
 import { useCart } from "@/context/CartContext";
 import { allProducts } from "@/data/products";
 
-@@ -18,14 +19,6 @@ const shoppableVideos = [
+const PERFUME_VIDEO_URL = "/videos/perfume-video.mp4";
+
+const shoppableVideos = [
+  {
+    videoUrl: PERFUME_VIDEO_URL,
+    product: allProducts[0],
+  },
+  {
+    videoUrl: PERFUME_VIDEO_URL,
+    product: allProducts[1],
+  },
+  {
     videoUrl: PERFUME_VIDEO_URL,
     product: allProducts[2],
   },
@@ -19,19 +29,42 @@ import { allProducts } from "@/data/products";
 ];
 
 const ShoppableVideos = () => {
-@@ -55,76 +48,53 @@ const ShoppableVideos = () => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const { addItem, setIsCartOpen } = useCart();
+
+  const scroll = (direction: "left" | "right") => {
+    if (scrollRef.current) {
+      const scrollAmount = 300;
+      scrollRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const handleAddToCart = (product: typeof allProducts[0]) => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      size: "50ml",
+      price: product.price,
+      quantity: 1,
+      image: product.image,
+    });
+    setIsCartOpen(true);
   };
 
   return (
     <section className="section-padding bg-background">
       <div className="container-wide">
-            {/* Header - Same style as Shop by Gender */}
-            <div className="text-center mb-12">
-              <h2 className="heading-section font-bold">
-                Shoppable <em className="highlighted-text not-italic">Videos</em>
-              </h2>
+        {/* Header */}
+        <div className="text-center mb-10">
+          <h2 className="text-2xl md:text-3xl font-bold text-charcoal tracking-wide">
+            SHOPPABLE <span className="text-primary">VIDEOS</span>
+          </h2>
+          <div className="w-24 h-0.5 bg-primary mx-auto mt-3 rounded-full" />
+        </div>
 
-            </div>
         {/* Videos Carousel */}
         <div className="relative">
           <button
@@ -95,7 +128,7 @@ const ShoppableVideos = () => {
         </div>
       </div>
     </section>
-      );
-    };
+  );
+};
 
-    export default ShoppableVideos;
+export default ShoppableVideos;
