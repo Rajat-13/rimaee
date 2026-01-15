@@ -6,7 +6,6 @@ import Footer from "@/components/Footer";
 import TrustBadges from "@/components/TrustBadges";
 import { allProducts, categories, genderOptions, Product } from "@/data/products";
 import { useWishlist } from "@/context/WishlistContext";
-import MarqueeBanner from "@/components/MarqueeBanner";
 import {
   Sheet,
   SheetContent,
@@ -182,9 +181,8 @@ const AllProducts = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <MarqueeBanner />
       <Header />
-      <main className="pt-32 md:pt-40">
+      <main className="pt-20 md:pt-24">
         <div className="container-wide px-4 py-8">
           {/* Header */}
           <div className="text-center mb-8">

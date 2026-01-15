@@ -4,11 +4,18 @@ export interface Product {
   slug: string;
   price: number;
   originalPrice?: number;
+  discount?: number;
   image: string;
   images: string[];
   tag?: string;
   gender: "for-him" | "for-her" | "unisex";
   category: string;
+  type?: "perfume" | "attar";
+  sku?: string;
+  minOrderThreshold?: number;
+  stockQuantity?: number;
+  watchingCount?: number;
+  isActive?: boolean;
   notes: {
     top: string[];
     middle: string[];
