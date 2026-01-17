@@ -16,7 +16,7 @@ const MarqueeBanner = () => {
 
   return (
     <section 
-      className={`fixed top-0 left-0 right-0 z-[60] h-8 w-full bg-red-500 text-white overflow-hidden transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-[60] h-8 w-full bg-black-500 text-white overflow-hidden transition-all duration-300 ${
         isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
       }`}
     >
