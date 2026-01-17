@@ -81,7 +81,7 @@ const Header = () => {
               <img src={logoImg} alt="RIMAE Logo" className="h-10 md:h-12 w-auto" />
               <div className="hidden sm:block text-left">
                 <p className="text-[10px] md:text-xs uppercase tracking-[0.15em] text-muted-foreground leading-tight">
-                  Perfume That
+                  Fragrance That
                 </p>
                 <p className="text-[10px] md:text-xs uppercase tracking-[0.15em] text-muted-foreground leading-tight">
                   Understands You

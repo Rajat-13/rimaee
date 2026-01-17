@@ -47,7 +47,7 @@ const Footer = () => {
               <img src={logoImg} alt="RIMAE Logo" className="h-12 w-auto invert" />
             </Link>
             <p className="text-xs uppercase tracking-[0.15em] text-primary-foreground/60 mb-4">
-              Perfume That Understands You
+              Fragrance That Understands You
             </p>
             <p className="text-sm text-primary-foreground/70 leading-relaxed">
               Crafting personalized fragrances since 2020. Your scent, your story.
