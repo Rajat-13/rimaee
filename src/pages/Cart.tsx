@@ -3,6 +3,7 @@ import { ChevronUp, ChevronDown, CornerDownLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MarqueeBanner from "@/components/MarqueeBanner";
+import CouponInput from "@/components/CouponInput";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useCart } from "@/context/CartContext";
@@ -150,6 +151,14 @@ const Cart = () => {
                     </a>{" "}
                     calculated at checkout.
                   </p>
+
+                  {/* Coupon Code */}
+                  <div className="mb-6">
+                    <label className="text-sm text-charcoal font-medium block mb-2">
+                      Have a coupon?
+                    </label>
+                    <CouponInput total={total} />
+                  </div>
 
                   {/* Order Note */}
                   <div className="mb-6">

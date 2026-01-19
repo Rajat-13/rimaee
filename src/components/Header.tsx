@@ -58,17 +58,24 @@ const Header = () => {
 
   return (
     <header 
-      className={`fixed left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border transition-all duration-300 ${
-        isScrolled ? "top-0" : isHomePage ? "top-8" : "top-0"
+      className={`fixed left-0 right-0 z-50 transition-all duration-500 ${
+        isScrolled 
+          ? "top-0 bg-gradient-to-r from-[#1a1817]/98 via-[#2D2A26]/98 to-[#1a1817]/98 backdrop-blur-md shadow-xl" 
+          : isHomePage 
+            ? "top-8 bg-gradient-to-r from-[#1a1817]/95 via-[#2D2A26]/95 to-[#1a1817]/95 backdrop-blur-sm" 
+            : "top-0 bg-gradient-to-r from-[#1a1817]/98 via-[#2D2A26]/98 to-[#1a1817]/98 backdrop-blur-md"
       }`}
     >
+      {/* Premium gold accent line */}
+      <div className="h-[1px] bg-gradient-to-r from-transparent via-gold to-transparent opacity-60" />
+      
       <div className="container-wide">
-        <div className={`flex items-center justify-between px-4 transition-all duration-300 ${
+        <div className={`flex items-center justify-between px-4 md:px-6 transition-all duration-300 ${
           isHomePage ? "h-20 md:h-24" : "h-14 md:h-16"
         }`}>
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2"
+            className="md:hidden p-2 text-white/90 hover:text-gold transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -76,14 +83,17 @@ const Header = () => {
           </button>
 
           {/* Logo */}
-          <div className="flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3">
-            <Link to="/" className="flex items-center gap-3">
-              <img src={logoImg} alt="RIMAE Logo" className="h-10 md:h-12 w-auto" />
+          <div className="flex-1 md:flex-none flex items-center justify-center md:justify-start gap-4">
+            <Link to="/" className="flex items-center gap-4 group">
+              <div className="relative">
+                <img src={logoImg} alt="RIMAE Logo" className="h-11 md:h-14 w-auto brightness-0 invert transition-transform duration-300 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-gold/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full blur-xl" />
+              </div>
               <div className="hidden sm:block text-left">
-                <p className="text-[10px] md:text-xs uppercase tracking-[0.15em] text-muted-foreground leading-tight">
+                <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-gold/80 leading-tight font-light">
                   Fragrance That
                 </p>
-                <p className="text-[10px] md:text-xs uppercase tracking-[0.15em] text-muted-foreground leading-tight">
+                <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-white/60 leading-tight font-light">
                   Understands You
                 </p>
               </div>
@@ -91,23 +101,29 @@ const Header = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
-              <Link key={link.name} to={link.href} className="nav-link text-sm font-medium">
+              <Link 
+                key={link.name} 
+                to={link.href} 
+                className="relative px-4 py-2 text-sm font-medium text-white/80 tracking-wide hover:text-gold transition-all duration-300 group"
+              >
                 {link.name}
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-to-r from-gold to-gold-light group-hover:w-3/4 transition-all duration-300" />
               </Link>
             ))}
             
             {/* Others Dropdown */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="nav-link text-sm font-medium flex items-center gap-1 outline-none">
+              <DropdownMenuTrigger className="relative px-4 py-2 text-sm font-medium text-white/80 tracking-wide hover:text-gold transition-all duration-300 flex items-center gap-1 outline-none group">
                 Others
-                <ChevronDown size={16} />
+                <ChevronDown size={14} className="group-hover:rotate-180 transition-transform duration-300" />
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-to-r from-gold to-gold-light group-hover:w-3/4 transition-all duration-300" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent align="end" className="w-48 bg-[#2D2A26] border-gold/20 shadow-2xl">
                 {otherLinks.map((link) => (
                   <DropdownMenuItem key={link.name} asChild>
-                    <Link to={link.href} className="w-full cursor-pointer">
+                    <Link to={link.href} className="w-full cursor-pointer text-white/80 hover:text-gold hover:bg-white/5 transition-colors">
                       {link.name}
                     </Link>
                   </DropdownMenuItem>
@@ -117,41 +133,41 @@ const Header = () => {
           </nav>
 
           {/* Icons */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1">
             <button 
-              className="p-2 hover:text-primary transition-colors" 
+              className="p-3 text-white/80 hover:text-gold transition-all duration-300 hover:bg-white/5 rounded-full" 
               aria-label="Search"
               onClick={() => setIsSearchOpen(true)}
             >
               <Search size={20} />
             </button>
             <button 
-              className="p-2 hover:text-primary transition-colors relative" 
+              className="p-3 text-white/80 hover:text-gold transition-all duration-300 hover:bg-white/5 rounded-full relative" 
               aria-label="Wishlist"
               onClick={() => setIsWishlistOpen(true)}
             >
               <Heart size={20} />
               {wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                <span className="absolute top-1 right-1 w-4 h-4 bg-gradient-to-br from-gold to-gold-light text-charcoal text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg">
                   {wishlistCount}
                 </span>
               )}
             </button>
             <button 
-              className="p-2 hover:text-primary transition-colors" 
+              className="p-3 text-white/80 hover:text-gold transition-all duration-300 hover:bg-white/5 rounded-full" 
               aria-label="Account"
               onClick={() => setIsLoginOpen(true)}
             >
               <User size={20} />
             </button>
             <button 
-              className="p-2 hover:text-primary transition-colors relative" 
+              className="p-3 text-white/80 hover:text-gold transition-all duration-300 hover:bg-white/5 rounded-full relative" 
               aria-label="Cart"
               onClick={() => setIsCartOpen(true)}
             >
               <ShoppingBag size={20} />
               {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center">
+                <span className="absolute top-1 right-1 w-4 h-4 bg-gradient-to-br from-gold to-gold-light text-charcoal text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg">
                   {itemCount}
                 </span>
               )}
@@ -161,25 +177,25 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <nav className="md:hidden border-t border-border py-4 px-4 animate-fade-in">
+          <nav className="md:hidden border-t border-gold/20 py-4 px-4 animate-fade-in bg-[#2D2A26]/95">
             {navLinks.map((link, index) => (
               <Link
                 key={link.name}
                 to={link.href}
-                className="block py-3 nav-link"
+                className="block py-3 text-white/80 hover:text-gold transition-colors font-medium tracking-wide"
                 style={{ animationDelay: `${index * 0.1}s` }}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {link.name}
               </Link>
             ))}
-            <div className="border-t border-border mt-3 pt-3">
-              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Others</p>
+            <div className="border-t border-gold/20 mt-3 pt-3">
+              <p className="text-xs text-gold/60 uppercase tracking-widest mb-2">Others</p>
               {otherLinks.map((link, index) => (
                 <Link
                   key={link.name}
                   to={link.href}
-                  className="block py-3 nav-link text-sm"
+                  className="block py-3 text-white/70 hover:text-gold transition-colors text-sm"
                   style={{ animationDelay: `${(navLinks.length + index) * 0.1}s` }}
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -190,6 +206,9 @@ const Header = () => {
           </nav>
         )}
       </div>
+      
+      {/* Bottom gold accent line */}
+      <div className="h-[1px] bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
 
       {/* Login Dialog */}
       <LoginDialog open={isLoginOpen} onOpenChange={handleLoginDialogChange} />
