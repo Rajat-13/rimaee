@@ -20,6 +20,7 @@ import {
   Sun,
   Search,
   User,
+  Tag,
 } from "lucide-react";
 import logoImg from "@/assets/logo.png";
 import { Input } from "@/components/ui/input";
@@ -40,6 +41,7 @@ const navItems = [
   { icon: Beaker, label: "Ingredients", path: "/admin/ingredients" },
   { icon: Palette, label: "Perfume Builder", path: "/admin/builder" },
   { icon: Package, label: "Accessories", path: "/admin/accessories" },
+  { icon: Tag, label: "Coupons", path: "/admin/coupons" },
   { icon: CreditCard, label: "Payments", path: "/admin/payments" },
   { icon: Bell, label: "Notifications", path: "/admin/notifications" },
   { icon: TrendingUp, label: "Analytics", path: "/admin/analytics" },

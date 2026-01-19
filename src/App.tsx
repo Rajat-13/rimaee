@@ -25,6 +25,7 @@ import Ingredients from "./pages/admin/Ingredients";
 import PerfumeBuilder from "./pages/admin/PerfumeBuilder";
 import Products from "./pages/admin/Products";
 import Fragrances from "./pages/admin/Fragrances";
+import Coupons from "./pages/admin/Coupons";
 import Payments from "./pages/admin/Payments";
 import Notifications from "./pages/admin/Notifications";
 import Analytics from "./pages/admin/Analytics";
@@ -81,6 +82,7 @@ const App = () => (
                 <Route path="ingredients" element={<Ingredients />} />
                 <Route path="builder" element={<PerfumeBuilder />} />
                 <Route path="accessories" element={<Products />} />
+                <Route path="coupons" element={<Coupons />} />
                 <Route path="payments" element={<Payments />} />
                 <Route path="notifications" element={<Notifications />} />
                 <Route path="analytics" element={<Analytics />} />

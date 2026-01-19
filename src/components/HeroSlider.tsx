@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroSlide1 from "@/assets/hero-slide-1.png";
 import heroSlide2 from "@/assets/hero-slide-2.png";
+import heroSlide3 from "@/assets/hero-slide-3.png";
 
 interface Slide {
   id: number;
@@ -20,6 +21,11 @@ const slides: Slide[] = [
     id: 2,
     image: heroSlide2,
     link: "/products/sandal-veer",
+  },
+  {
+    id: 3,
+    image: heroSlide3,
+    link: "/all-products?promo=RIMAENEW",
   },
 ];
 
