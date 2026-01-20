@@ -36,11 +36,11 @@ const Header = () => {
   }, []);
 
   const navLinks = [
-    { name: "Home", href: "/" },
-    { name: "Store", href: "/all-products" },
-    { name: "Personalised", href: "/personalised" },
+    { name: "HOME", href: "/" },
+    { name: "STORE", href: "/all-products" },
+    { name: "PERSONALIZED", href: "/personalised" },
     { name: "Ai", href: "/my-type" },
-    { name: "Accessories", href: "/accessories" },
+    { name: "ACCESSORIES", href: "/accessories" },
   ];
 
   const otherLinks = [
