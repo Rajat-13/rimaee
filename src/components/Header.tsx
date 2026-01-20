@@ -44,9 +44,9 @@ const Header = () => {
   ];
 
   const otherLinks = [
-    { name: "About Us", href: "/about-us" },
+    { name: "ABOUT US", href: "/about-us" },
     { name: "FAQ", href: "/faq" },
-    { name: "Privacy Policy", href: "/privacy-policy" },
+    { name: "PRIVACY POLICY", href: "/privacy-policy" },
   ];
 
   const handleLoginDialogChange = (open: boolean, navigateTo?: string) => {
