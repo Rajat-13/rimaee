@@ -45,26 +45,25 @@ const HeroSlider = () => {
 
   return (
     <section className="relative overflow-hidden">
-      <div className="relative">
+      <div className="relative h-[500px] md:h-[650px]">
         {slides.map((slide, index) => (
           <div
             key={slide.id}
-            className={`transition-opacity duration-700 ${
-              index === currentSlide ? "opacity-100 relative" : "opacity-0 absolute inset-0"
+            className={`absolute inset-0 transition-all duration-700 ease-in-out ${
+              index === currentSlide 
+                ? "opacity-100 scale-100 z-10" 
+                : "opacity-0 scale-105 z-0"
             }`}
           >
             <Link 
               to={slide.link}
-              className="block"
+              className="block w-full h-full"
             >
-              {/* Image container - 1536x1024 images display full without crop */}
-              <div className="w-full aspect-[3/2]">
-                <img
-                  src={slide.image}
-                  alt={`Slide ${slide.id}`}
-                  className="w-full h-full object-contain bg-muted"
-                />
-              </div>
+              <img
+                src={slide.image}
+                alt={`Slide ${slide.id}`}
+                className="w-full h-full object-cover"
+              />
             </Link>
           </div>
         ))}
@@ -94,8 +93,8 @@ const HeroSlider = () => {
             onClick={() => goToSlide(index)}
             className={`h-2 md:h-2.5 rounded-full transition-all duration-500 ${
               index === currentSlide
-                ? "bg-charcoal w-8 md:w-10"
-                : "bg-charcoal/30 w-4 md:w-6 hover:bg-charcoal/50"
+                ? "bg-white w-8 md:w-10"
+                : "bg-white/50 w-4 md:w-6 hover:bg-white/70"
             }`}
             aria-label={`Go to slide ${index + 1}`}
           />
