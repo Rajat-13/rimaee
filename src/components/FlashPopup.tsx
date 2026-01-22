@@ -97,13 +97,8 @@ const FlashPopup = ({ config = {} }: FlashPopupProps) => {
     // Don't show on admin routes
     if (!mergedConfig.isEnabled || !mergedConfig.showOnLoad || isAdminRoute) return;
 
-    // Check if popup was already shown in this session
-    const wasShown = sessionStorage.getItem("flash-popup-shown");
-    if (wasShown) return;
-
     const timer = setTimeout(() => {
       setIsOpen(true);
-      sessionStorage.setItem("flash-popup-shown", "true");
     }, mergedConfig.delaySeconds * 1000);
 
     return () => clearTimeout(timer);
