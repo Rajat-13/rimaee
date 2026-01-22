@@ -36,12 +36,13 @@ const SprayParticles = ({ isAnimating }: { isAnimating: boolean }) => {
               scale: 0 
             }}
             animate={isAnimating ? {
-              x: [0, Math.cos(angle * Math.PI / 180) * distance],
-              y: [0, Math.sin(angle * Math.PI / 180) * distance],
-              opacity: [0, 0.8, 0],
-              scale: [0, 1.5, 0],
-            } : {}}
+              x: Math.cos(angle * Math.PI / 180) * distance,
+              y: Math.sin(angle * Math.PI / 180) * distance,
+              opacity: 0,
+              scale: 1.5,
+            } : { x: 0, y: 0, opacity: 0, scale: 0 }}
             transition={{
+              type: "tween",
               duration: 0.8,
               delay,
               ease: "easeOut",
@@ -59,10 +60,12 @@ const MistEffect = ({ isAnimating }: { isAnimating: boolean }) => {
     <motion.div
       className="absolute inset-0 pointer-events-none"
       initial={{ opacity: 0 }}
-      animate={isAnimating ? {
-        opacity: [0, 0.4, 0],
-      } : { opacity: 0 }}
-      transition={{ duration: 1.2, ease: "easeInOut" }}
+      animate={{ opacity: isAnimating ? 0.4 : 0 }}
+      transition={{ 
+        type: "tween",
+        duration: 0.6, 
+        ease: "easeInOut" 
+      }}
     >
       <div className="absolute inset-0 bg-gradient-radial from-gold/30 via-gold/10 to-transparent blur-md" />
     </motion.div>
