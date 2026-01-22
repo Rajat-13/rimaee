@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroSlide1 from "@/assets/hero-slide-1.png";
 import heroSlide2 from "@/assets/hero-slide-2.png";
@@ -45,46 +44,29 @@ const HeroSlider = () => {
 
   return (
     <section className="relative overflow-hidden">
-      <div className="relative">
+      <div className="relative h-[500px] md:h-[650px]">
         {slides.map((slide, index) => (
           <div
             key={slide.id}
-            className={`transition-opacity duration-700 ${
-              index === currentSlide ? "opacity-100 relative" : "opacity-0 absolute inset-0"
+            className={`absolute inset-0 transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
+              index === currentSlide 
+                ? "opacity-100 translate-x-0 z-10" 
+                : "opacity-0 -translate-x-full z-0"
             }`}
           >
             <Link 
               to={slide.link}
-              className="block"
+              className="block w-full h-full"
             >
-              {/* Image container - 1536x1024 images display full without crop */}
-              <div className="w-full aspect-[3/2]">
-                <img
-                  src={slide.image}
-                  alt={`Slide ${slide.id}`}
-                  className="w-full h-full object-contain bg-muted"
-                />
-              </div>
+              <img
+                src={slide.image}
+                alt={`Slide ${slide.id}`}
+                className="w-full h-full object-cover"
+              />
             </Link>
           </div>
         ))}
       </div>
-
-      {/* Navigation Arrows */}
-      <button
-        onClick={(e) => { e.preventDefault(); prevSlide(); }}
-        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/80 backdrop-blur-sm hover:bg-white rounded-full transition-all duration-300 shadow-lg"
-        aria-label="Previous slide"
-      >
-        <ChevronLeft size={20} className="text-charcoal md:w-6 md:h-6" />
-      </button>
-      <button
-        onClick={(e) => { e.preventDefault(); nextSlide(); }}
-        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/80 backdrop-blur-sm hover:bg-white rounded-full transition-all duration-300 shadow-lg"
-        aria-label="Next slide"
-      >
-        <ChevronRight size={20} className="text-charcoal md:w-6 md:h-6" />
-      </button>
 
       {/* Dots */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-3">
@@ -94,8 +76,8 @@ const HeroSlider = () => {
             onClick={() => goToSlide(index)}
             className={`h-2 md:h-2.5 rounded-full transition-all duration-500 ${
               index === currentSlide
-                ? "bg-charcoal w-8 md:w-10"
-                : "bg-charcoal/30 w-4 md:w-6 hover:bg-charcoal/50"
+                ? "bg-white w-8 md:w-10"
+                : "bg-white/50 w-4 md:w-6 hover:bg-white/70"
             }`}
             aria-label={`Go to slide ${index + 1}`}
           />
