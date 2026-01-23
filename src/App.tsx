@@ -43,10 +43,12 @@ import LandingSetup from "./pages/admin/LandingSetup";
 import ContentPages from "./pages/admin/ContentPages";
 import SearchSeoAdmin from "./pages/admin/SearchSeoAdmin";
 import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
 import CartDrawer from "./components/CartDrawer";
 import CheckoutDialog from "./components/CheckoutDialog";
 import WishlistDrawer from "./components/WishlistDrawer";
 import SocialProofPopup from "./components/SocialProofPopup";
+import ReviewsAdmin from "./pages/admin/ReviewsAdmin";
 
 const queryClient = new QueryClient();
 
@@ -79,6 +81,7 @@ const AnimatedRoutes = () => {
         <Route path="/about-us" element={<PageTransition><AboutUs /></PageTransition>} />
         <Route path="/faq" element={<PageTransition><FAQ /></PageTransition>} />
         <Route path="/privacy-policy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
+        <Route path="/profile" element={<Profile />} />
         
         {/* Admin Routes with Layout */}
         <Route path="/admin" element={<AdminLayout />}>
@@ -87,6 +90,7 @@ const AnimatedRoutes = () => {
           <Route path="inventory" element={<Inventory />} />
           <Route path="logistics" element={<Logistics />} />
           <Route path="customers" element={<Customers />} />
+          <Route path="reviews" element={<ReviewsAdmin />} />
           <Route path="fragrances" element={<Fragrances />} />
           <Route path="assets" element={<AssetManager />} />
           <Route path="accessories" element={<AccessoriesAdmin />} />
