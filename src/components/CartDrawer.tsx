@@ -35,17 +35,10 @@ const CartDrawer = () => {
     <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
       <SheetContent className="w-full sm:max-w-lg p-0 flex flex-col">
         {/* Header */}
-        <SheetHeader className="p-4 border-b border-border">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <SheetTitle className="font-serif text-2xl tracking-tight">
-                CART<sup className="text-sm">{itemCount}</sup>
-              </SheetTitle>
-              <button className="text-muted-foreground text-lg font-light hover:text-charcoal transition-colors">
-                RECENTLY VIEWED
-              </button>
-            </div>
-          </div>
+        <SheetHeader className="p-6 pt-8 border-b border-border">
+          <SheetTitle className="font-serif text-2xl tracking-tight">
+            CART<sup className="text-sm ml-1">{itemCount}</sup>
+          </SheetTitle>
         </SheetHeader>
 
         {/* Free Shipping Progress */}

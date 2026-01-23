@@ -88,27 +88,62 @@ const Header = () => {
             <Link to="/" className="flex items-center gap-4 group">
               <motion.div 
                 className="relative"
-                animate={{ 
-                  rotateY: [0, 10, -10, 0],
-                }}
-                transition={{ 
-                  duration: 4, 
-                  repeat: Infinity, 
-                  repeatDelay: 3,
-                  ease: "easeInOut" 
-                }}
+                style={{ perspective: 1000 }}
               >
-                <motion.img 
-                  src={logoImg} 
-                  alt="RIMAE Logo" 
-                  className="h-11 md:h-14 w-auto brightness-0 invert"
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                />
+                {/* Luxury perfume bottle silhouette animation */}
+                <motion.div
+                  className="relative"
+                  animate={{ 
+                    rotateY: [0, 15, -15, 0],
+                    rotateX: [0, 5, -5, 0],
+                  }}
+                  transition={{ 
+                    duration: 6, 
+                    repeat: Infinity, 
+                    repeatDelay: 2,
+                    ease: "easeInOut" 
+                  }}
+                  style={{ transformStyle: "preserve-3d" }}
+                >
+                  <motion.img 
+                    src={logoImg} 
+                    alt="RIMAE Logo" 
+                    className="h-11 md:h-14 w-auto brightness-0 invert drop-shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+                    whileHover={{ 
+                      scale: 1.15, 
+                      rotateZ: 5,
+                      filter: "drop-shadow(0 0 25px rgba(212,175,55,0.6))"
+                    }}
+                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                  />
+                </motion.div>
+                
+                {/* Elegant golden shimmer effect */}
                 <motion.div 
-                  className="absolute inset-0 bg-gradient-to-tr from-gold/30 to-transparent rounded-full blur-xl"
-                  animate={{ opacity: [0.3, 0.6, 0.3] }}
-                  transition={{ duration: 2, repeat: Infinity }}
+                  className="absolute inset-0 bg-gradient-to-tr from-gold/20 via-transparent to-gold/10 rounded-full blur-xl"
+                  animate={{ 
+                    opacity: [0.2, 0.5, 0.2],
+                    scale: [1, 1.2, 1],
+                  }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                />
+                
+                {/* Sparkle particles */}
+                <motion.div
+                  className="absolute -top-1 -right-1 w-2 h-2 bg-gold rounded-full"
+                  animate={{ 
+                    opacity: [0, 1, 0],
+                    scale: [0.5, 1, 0.5],
+                  }}
+                  transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+                />
+                <motion.div
+                  className="absolute -bottom-1 right-2 w-1.5 h-1.5 bg-gold-light rounded-full"
+                  animate={{ 
+                    opacity: [0, 1, 0],
+                    scale: [0.5, 1, 0.5],
+                  }}
+                  transition={{ duration: 2.5, repeat: Infinity, delay: 1 }}
                 />
               </motion.div>
               <div className="hidden sm:block text-left">

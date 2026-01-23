@@ -21,6 +21,7 @@ import {
   Tag,
   Sparkles,
   Wand2,
+  MessageSquare,
 } from "lucide-react";
 import logoImg from "@/assets/logo.png";
 import { Input } from "@/components/ui/input";
@@ -39,6 +40,7 @@ const navItems = [
   { icon: Package, label: "Inventory", path: "/admin/inventory" },
   { icon: Package, label: "Logistics", path: "/admin/logistics" },
   { icon: Users, label: "Customers", path: "/admin/customers" },
+  { icon: MessageSquare, label: "Reviews", path: "/admin/reviews" },
   { icon: Package, label: "Fragrances", path: "/admin/fragrances" },
   { icon: Package, label: "Accessories", path: "/admin/accessories" },
   { icon: LayoutDashboard, label: "Landing Setup", path: "/admin/landing" },
