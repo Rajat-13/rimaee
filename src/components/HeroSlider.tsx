@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroSlide1 from "@/assets/hero-slide-1.png";
 import heroSlide2 from "@/assets/hero-slide-2.png";
@@ -49,10 +48,10 @@ const HeroSlider = () => {
         {slides.map((slide, index) => (
           <div
             key={slide.id}
-            className={`absolute inset-0 transition-all duration-700 ease-in-out ${
+            className={`absolute inset-0 transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
               index === currentSlide 
-                ? "opacity-100 scale-100 z-10" 
-                : "opacity-0 scale-105 z-0"
+                ? "opacity-100 translate-x-0 z-10" 
+                : "opacity-0 -translate-x-full z-0"
             }`}
           >
             <Link 
@@ -68,22 +67,6 @@ const HeroSlider = () => {
           </div>
         ))}
       </div>
-
-      {/* Navigation Arrows */}
-      <button
-        onClick={(e) => { e.preventDefault(); prevSlide(); }}
-        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/80 backdrop-blur-sm hover:bg-white rounded-full transition-all duration-300 shadow-lg"
-        aria-label="Previous slide"
-      >
-        <ChevronLeft size={20} className="text-charcoal md:w-6 md:h-6" />
-      </button>
-      <button
-        onClick={(e) => { e.preventDefault(); nextSlide(); }}
-        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/80 backdrop-blur-sm hover:bg-white rounded-full transition-all duration-300 shadow-lg"
-        aria-label="Next slide"
-      >
-        <ChevronRight size={20} className="text-charcoal md:w-6 md:h-6" />
-      </button>
 
       {/* Dots */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-3">
