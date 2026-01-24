@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, ShoppingBag, User, Search, ChevronDown, Heart } from "lucide-react";
+import { Menu, X, ShoppingBag, User, Search, ChevronDown, Heart, LogOut } from "lucide-react";
 import { motion } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { useAuth } from "@/context/AuthContext";
 import LoginDialog from "./LoginDialog";
 import SearchDrawer from "./SearchDrawer";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import logoImg from "@/assets/logo.png";
@@ -21,6 +23,7 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const { itemCount, setIsCartOpen } = useCart();
   const { itemCount: wishlistCount, setIsWishlistOpen } = useWishlist();
+  const { user, isLoggedIn, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -210,13 +213,42 @@ const Header = () => {
                 </span>
               )}
             </button>
-            <button 
-              className="p-3 text-white/80 hover:text-gold transition-all duration-300 hover:bg-white/5 rounded-full" 
-              aria-label="Account"
-              onClick={() => setIsLoginOpen(true)}
-            >
-              <User size={20} />
-            </button>
+            {/* User Account */}
+            {isLoggedIn ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="p-3 text-white/80 hover:text-gold transition-all duration-300 hover:bg-white/5 rounded-full outline-none">
+                  <User size={20} />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 bg-[#2D2A26] border-gold/20 shadow-2xl">
+                  <div className="px-3 py-2 border-b border-gold/20">
+                    <p className="text-white font-medium text-sm">{user?.name}</p>
+                    <p className="text-white/60 text-xs truncate">{user?.email}</p>
+                  </div>
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="w-full cursor-pointer text-white/80 hover:text-gold hover:bg-white/5 transition-colors">
+                      <User className="w-4 h-4 mr-2" />
+                      My Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-gold/20" />
+                  <DropdownMenuItem 
+                    onClick={logout}
+                    className="cursor-pointer text-red-400 hover:text-red-300 hover:bg-white/5 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <button 
+                className="p-3 text-white/80 hover:text-gold transition-all duration-300 hover:bg-white/5 rounded-full" 
+                aria-label="Account"
+                onClick={() => setIsLoginOpen(true)}
+              >
+                <User size={20} />
+              </button>
+            )}
             <button 
               className="p-3 text-white/80 hover:text-gold transition-all duration-300 hover:bg-white/5 rounded-full relative" 
               aria-label="Cart"

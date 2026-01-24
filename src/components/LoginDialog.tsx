@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { ArrowLeft, Mail, Phone, User, Sparkles, Gift, CheckCircle2 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 import logoImg from "@/assets/logo.png";
 
 interface LoginDialogProps {
@@ -27,6 +28,7 @@ const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
   const [emailOtp, setEmailOtp] = useState("");
   const [notifyMe, setNotifyMe] = useState(true);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handlePhoneSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,6 +64,8 @@ const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
     e.preventDefault();
     if (emailOtp.length === 6) {
       console.log("Email verified! User registered:", { phone, username, email });
+      // Save user to auth context
+      login({ name: username, email, phone: `+91 ${phone}` });
       setStep("success");
     }
   };

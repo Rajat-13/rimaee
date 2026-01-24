@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { allProducts } from "@/data/products";
 import ScrollReveal from "./ScrollReveal";
+import AnimatedHeader from "./AnimatedHeader";
 
 const PERFUME_VIDEO_URL = "/videos/perfume-video.mp4";
 
@@ -59,12 +60,13 @@ const ShoppableVideos = () => {
     <section className="section-padding bg-background">
       <div className="container-wide">
         {/* Header */}
-        <ScrollReveal className="text-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-bold text-charcoal tracking-wide">
-            SHOPPABLE <span className="text-primary">VIDEOS</span>
-          </h2>
-          <div className="w-24 h-0.5 bg-primary mx-auto mt-3 rounded-full" />
-        </ScrollReveal>
+        <div className="text-center mb-10">
+          <AnimatedHeader>
+            <h2 className="heading-section font-bold">
+              Shoppable <em className="highlighted-text not-italic">Videos</em>
+            </h2>
+          </AnimatedHeader>
+        </div>
 
         {/* Videos Carousel */}
         <ScrollReveal delay={0.2}>

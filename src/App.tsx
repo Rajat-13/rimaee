@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
+import { AuthProvider } from "@/context/AuthContext";
+import { RecentlyViewedProvider } from "@/context/RecentlyViewedContext";
 import PageTransition from "./components/PageTransition";
 import FlashPopup from "./components/FlashPopup";
 import Index from "./pages/Index";
@@ -117,21 +119,25 @@ const AnimatedRoutes = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <CartProvider>
-        <WishlistProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <ScrollToTop />
-            <CartDrawer />
-            <CheckoutDialog />
-            <WishlistDrawer />
-            <FlashPopup />
-            <SocialProofPopup />
-            <AnimatedRoutes />
-          </BrowserRouter>
-        </WishlistProvider>
-      </CartProvider>
+      <AuthProvider>
+        <RecentlyViewedProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <ScrollToTop />
+                <CartDrawer />
+                <CheckoutDialog />
+                <WishlistDrawer />
+                <FlashPopup />
+                <SocialProofPopup />
+                <AnimatedRoutes />
+              </BrowserRouter>
+            </WishlistProvider>
+          </CartProvider>
+        </RecentlyViewedProvider>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

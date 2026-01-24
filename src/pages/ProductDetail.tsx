@@ -8,6 +8,7 @@ import ReviewDialog from "@/components/ReviewDialog";
 import CustomerAlsoLove from "@/components/CustomerAlsoLove";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { useRecentlyViewed } from "@/context/RecentlyViewedContext";
 import intensityImg from "@/assets/intensity-reference.webp";
 import personalityImg from "@/assets/personality-reference.webp";
 import concentrationImg from "@/assets/concentration-comparison.jpg";
@@ -120,6 +121,21 @@ const ProductDetail = () => {
       slug: slug || "sandal-veer",
     });
   };
+
+  const { addViewedProduct } = useRecentlyViewed();
+
+  // Track product view
+  useEffect(() => {
+    if (slug && product) {
+      addViewedProduct({
+        id: slug,
+        name: product.name,
+        price: product.price,
+        image: product.images[0],
+        slug: slug,
+      });
+    }
+  }, [slug]);
 
   const handleAddToCart = () => {
     addItem({
