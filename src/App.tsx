@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -57,18 +57,18 @@ const queryClient = new QueryClient();
 // Scroll to top on route change
 const ScrollToTop = () => {
   const { pathname } = useLocation();
-  
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
-  
+
   return null;
 };
 
 // Animated Routes Component
 const AnimatedRoutes = () => {
   const location = useLocation();
-  
+
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
@@ -84,7 +84,7 @@ const AnimatedRoutes = () => {
         <Route path="/faq" element={<PageTransition><FAQ /></PageTransition>} />
         <Route path="/privacy-policy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
         <Route path="/profile" element={<Profile />} />
-        
+
         {/* Admin Routes with Layout */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
@@ -109,37 +109,58 @@ const AnimatedRoutes = () => {
           <Route path="analytics" element={<Analytics />} />
           <Route path="settings" element={<Settings />} />
         </Route>
-        
+
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
   );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <RecentlyViewedProvider>
-          <CartProvider>
-            <WishlistProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <ScrollToTop />
-                <CartDrawer />
-                <CheckoutDialog />
-                <WishlistDrawer />
-                <FlashPopup />
-                <SocialProofPopup />
-                <AnimatedRoutes />
-              </BrowserRouter>
-            </WishlistProvider>
-          </CartProvider>
-        </RecentlyViewedProvider>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+ const App = () => {
+   // ✅ Hooks at top level
+   const [message, setMessage] = useState("");
 
-export default App;
+   useEffect(() => {
+     fetch("http://127.0.0.1:8000/api/")
+       .then((response) => response.json())
+       .then((data) => setMessage(data.message))
+       .catch((error) =>
+         console.error("Error fetching message:", error)
+       );
+   }, []);
+
+   return (
+     <>
+       {/* Backend test message */}
+       <div >
+         <p>{message || 'Loading.....'}</p>
+       </div>
+
+       <QueryClientProvider client={queryClient}>
+         <TooltipProvider>
+           <AuthProvider>
+             <RecentlyViewedProvider>
+               <CartProvider>
+                 <WishlistProvider>
+                   <Toaster />
+                   <Sonner />
+                   <BrowserRouter>
+                     <ScrollToTop />
+                     <CartDrawer />
+                     <CheckoutDialog />
+                     <WishlistDrawer />
+                     <FlashPopup />
+                     <SocialProofPopup />
+                     <AnimatedRoutes />
+                   </BrowserRouter>
+                 </WishlistProvider>
+               </CartProvider>
+             </RecentlyViewedProvider>
+           </AuthProvider>
+         </TooltipProvider>
+       </QueryClientProvider>
+     </>
+   );
+ };
+
+ export default App;
