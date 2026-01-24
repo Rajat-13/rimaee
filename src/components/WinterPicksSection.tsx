@@ -98,10 +98,9 @@ const WinterPicksSection = () => {
         {/* Mobile Title */}
         <div className="lg:hidden mb-6 text-center">
           <AnimatedHeader>
-            <h2 className="text-xl font-bold text-charcoal">EXPLORE</h2>
-            <h3 className="text-2xl font-bold text-primary">
-              OUR WINTER PICKS
-            </h3>
+            <h2 className="heading-section font-bold">
+              Explore <em className="highlighted-text not-italic">Our Winter Picks</em>
+            </h2>
           </AnimatedHeader>
         </div>
 
@@ -139,14 +138,9 @@ const WinterPicksSection = () => {
             {/* Desktop Title */}
             <div className="hidden lg:block mb-6">
               <AnimatedHeader>
-                <h2 className="text-xl md:text-2xl font-bold text-charcoal">
-                  EXPLORE
+                <h2 className="heading-section font-bold">
+                  Explore <em className="highlighted-text not-italic">Our Winter Picks</em>
                 </h2>
-                <h3 className="text-2xl md:text-3xl font-bold text-primary">
-                  OUR WINTER
-                  <br />
-                  PICKS
-                </h3>
               </AnimatedHeader>
             </div>
 

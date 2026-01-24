@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { allProducts } from "@/data/products";
 
 // Indian cities for random display
@@ -51,6 +51,9 @@ interface SocialProofSettings {
 }
 
 const SocialProofPopup = () => {
+  const location = useLocation();
+  const isAdminPage = location.pathname.startsWith('/admin');
+  
   const [isVisible, setIsVisible] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<typeof allProducts[0] | null>(null);
   const [currentCity, setCurrentCity] = useState("");
@@ -70,7 +73,7 @@ const SocialProofPopup = () => {
   }, []);
 
   useEffect(() => {
-    if (!settings.enabled) return;
+    if (!settings.enabled || isAdminPage) return;
 
     const showPopup = () => {
       const availableProducts = allProducts.filter(p => 
@@ -110,13 +113,14 @@ const SocialProofPopup = () => {
       clearTimeout(initialTimeout);
       clearTimeout(intervalTimeout);
     };
-  }, [settings, intervalIndex]);
+  }, [settings, intervalIndex, isAdminPage]);
 
   const handleClose = () => {
     setIsVisible(false);
   };
 
-  if (!currentProduct) return null;
+  // Don't render on admin pages
+  if (isAdminPage || !currentProduct) return null;
 
   return (
     <AnimatePresence>
