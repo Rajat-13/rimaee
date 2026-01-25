@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -116,51 +116,30 @@ const AnimatedRoutes = () => {
   );
 };
 
- const App = () => {
-   // ✅ Hooks at top level
-   const [message, setMessage] = useState("");
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <AuthProvider>
+        <RecentlyViewedProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <ScrollToTop />
+                <CartDrawer />
+                <CheckoutDialog />
+                <WishlistDrawer />
+                <FlashPopup />
+                <SocialProofPopup />
+                <AnimatedRoutes />
+              </BrowserRouter>
+            </WishlistProvider>
+          </CartProvider>
+        </RecentlyViewedProvider>
+      </AuthProvider>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
 
-   useEffect(() => {
-     fetch("http://127.0.0.1:8000/api/")
-       .then((response) => response.json())
-       .then((data) => setMessage(data.message))
-       .catch((error) =>
-         console.error("Error fetching message:", error)
-       );
-   }, []);
-
-   return (
-     <>
-       {/* Backend test message */}
-       <div >
-         <p>{message || 'Loading.....'}</p>
-       </div>
-
-       <QueryClientProvider client={queryClient}>
-         <TooltipProvider>
-           <AuthProvider>
-             <RecentlyViewedProvider>
-               <CartProvider>
-                 <WishlistProvider>
-                   <Toaster />
-                   <Sonner />
-                   <BrowserRouter>
-                     <ScrollToTop />
-                     <CartDrawer />
-                     <CheckoutDialog />
-                     <WishlistDrawer />
-                     <FlashPopup />
-                     <SocialProofPopup />
-                     <AnimatedRoutes />
-                   </BrowserRouter>
-                 </WishlistProvider>
-               </CartProvider>
-             </RecentlyViewedProvider>
-           </AuthProvider>
-         </TooltipProvider>
-       </QueryClientProvider>
-     </>
-   );
- };
-
- export default App;
+export default App;
