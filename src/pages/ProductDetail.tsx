@@ -12,7 +12,7 @@ import { useRecentlyViewed } from "@/context/RecentlyViewedContext";
 import intensityImg from "@/assets/intensity-reference.webp";
 import personalityImg from "@/assets/personality-reference.webp";
 import concentrationImg from "@/assets/concentration-comparison.jpg";
-
+import trustBadgesImg from "@/assets/trust-badges.png";
 // Sample product data - in real app this would come from API/ViewModel
 const products: Record<string, {
   name: string;
@@ -449,6 +449,14 @@ const ProductDetail = () => {
                 >
                   Buy it now
                 </button>
+              </div>
+              {/* Trust Badges */}
+              <div className="py-4">
+                <img
+                  src={trustBadgesImg}
+                  alt="8 Hrs Lasting, MSDS Certified, Value for Money, 98.5% Similar Fragrance, Made in India"
+                  className="w-full max-w-md"
+                />
               </div>
 
               {/* Share Section */}

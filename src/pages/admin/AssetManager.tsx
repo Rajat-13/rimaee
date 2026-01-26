@@ -1,465 +1,235 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Upload, 
-  Image, 
-  Video, 
-  Copy, 
-  Trash2, 
-  Search, 
-  ExternalLink,
-  FileImage,
-  FileVideo,
-  Eye,
-  X
+import {
+  Upload, Image as ImageIcon, Video, Copy, Trash2,
+  Search, FileImage, FileVideo, Eye, X
 } from "lucide-react";
 import { toast } from "sonner";
 
 interface Asset {
   id: string;
   name: string;
-  type: "image" | "video";
-  url: string;
-  size: string;
-  uploadedAt: string;
-  usedIn: string[];
+  asset_type: "image" | "video" | "gif";
+  file_url: string;
+  size_mb: number;
+  created_at: string;
 }
 
-// Mock assets data - replace with actual storage integration
-const mockAssets: Asset[] = [
-  {
-    id: "1",
-    name: "hero-slide-1.png",
-    type: "image",
-    url: "/src/assets/hero-slide-1.png",
-    size: "245 KB",
-    uploadedAt: "2024-01-15",
-    usedIn: ["Home Page - Hero Slider"]
-  },
-  {
-    id: "2",
-    name: "hero-slide-2.png",
-    type: "image",
-    url: "/src/assets/hero-slide-2.png",
-    size: "312 KB",
-    uploadedAt: "2024-01-15",
-    usedIn: ["Home Page - Hero Slider"]
-  },
-  {
-    id: "3",
-    name: "hero-slide-3.png",
-    type: "image",
-    url: "/src/assets/hero-slide-3.png",
-    size: "287 KB",
-    uploadedAt: "2024-01-15",
-    usedIn: ["Home Page - Hero Slider"]
-  },
-  {
-    id: "4",
-    name: "for-him.png",
-    type: "image",
-    url: "/src/assets/for-him.png",
-    size: "156 KB",
-    uploadedAt: "2024-01-14",
-    usedIn: ["Home Page - Gender Section"]
-  },
-  {
-    id: "5",
-    name: "for-her.png",
-    type: "image",
-    url: "/src/assets/for-her.png",
-    size: "178 KB",
-    uploadedAt: "2024-01-14",
-    usedIn: ["Home Page - Gender Section"]
-  },
-  {
-    id: "6",
-    name: "unisex.png",
-    type: "image",
-    url: "/src/assets/unisex.png",
-    size: "145 KB",
-    uploadedAt: "2024-01-14",
-    usedIn: ["Home Page - Gender Section"]
-  },
-  {
-    id: "7",
-    name: "logo.png",
-    type: "image",
-    url: "/src/assets/logo.png",
-    size: "24 KB",
-    uploadedAt: "2024-01-10",
-    usedIn: ["Header", "Footer", "Admin Sidebar"]
-  },
-  {
-    id: "8",
-    name: "perfume-video.mp4",
-    type: "video",
-    url: "/public/videos/perfume-video.mp4",
-    size: "4.2 MB",
-    uploadedAt: "2024-01-12",
-    usedIn: ["Home Page - Shoppable Videos"]
-  },
-  {
-    id: "9",
-    name: "concentration-comparison.jpg",
-    type: "image",
-    url: "/src/assets/concentration-comparison.jpg",
-    size: "89 KB",
-    uploadedAt: "2024-01-11",
-    usedIn: ["Personalised Page"]
-  },
-  {
-    id: "10",
-    name: "intensity-reference.webp",
-    type: "image",
-    url: "/src/assets/intensity-reference.webp",
-    size: "67 KB",
-    uploadedAt: "2024-01-11",
-    usedIn: ["Personalised Page"]
-  },
-  {
-    id: "11",
-    name: "personality-reference.webp",
-    type: "image",
-    url: "/src/assets/personality-reference.webp",
-    size: "72 KB",
-    uploadedAt: "2024-01-11",
-    usedIn: ["Personalised Page"]
-  },
-];
+const API_BASE_URL = "http://127.0.0.1:8000/api/v1/assets/";
 
 const AssetManager = () => {
-  const [assets, setAssets] = useState<Asset[]>(mockAssets);
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [totalMemory, setTotalMemory] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
-  const [dragActive, setDragActive] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const filteredAssets = assets.filter(asset =>
-    asset.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    asset.usedIn.some(usage => usage.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const fetchAssets = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(API_BASE_URL);
+      const data = await response.json();
 
-  const imageAssets = filteredAssets.filter(a => a.type === "image");
-  const videoAssets = filteredAssets.filter(a => a.type === "video");
+      // Handle DRF Pagination results wrapper
+      let rawAssets = [];
+      if (data.assets?.results && Array.isArray(data.assets.results)) {
+        rawAssets = data.assets.results;
+      } else if (Array.isArray(data.assets)) {
+        rawAssets = data.assets;
+      }
+
+      setAssets(rawAssets);
+      setTotalMemory(data.total_memory_utilisation_mb || 0);
+    } catch (error) {
+      toast.error("Failed to load assets");
+      setAssets([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchAssets(); }, []);
+
+  // Filter based on Search Input
+  const filteredAssets = useMemo(() => {
+    return (assets || []).filter(a =>
+      a.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [assets, searchQuery]);
+
+  const handleFiles = async (files: FileList) => {
+    const toastId = toast.loading("Uploading files...");
+    try {
+      for (const file of Array.from(files)) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("name", file.name);
+
+        const res = await fetch(API_BASE_URL, { method: "POST", body: formData });
+        if (!res.ok) throw new Error(`Failed to upload ${file.name}`);
+      }
+      toast.success("All files uploaded", { id: toastId });
+      fetchAssets();
+    } catch (err) {
+      toast.error("Upload failed", { id: toastId });
+    }
+  };
 
   const copyUrl = (url: string) => {
     navigator.clipboard.writeText(url);
     toast.success("URL copied to clipboard");
   };
 
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
+  const deleteAsset = async (id: string) => {
+    if (!confirm("Delete this asset permanently?")) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}${id}/`, { method: "DELETE" });
+      if (res.ok) {
+        toast.success("Asset deleted");
+        fetchAssets();
+      }
+    } catch (err) {
+      toast.error("Delete failed");
     }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFiles(e.dataTransfer.files);
-    }
-  };
+  const AssetGrid = ({ items }: { items: Asset[] }) => (
+    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      {items.map((asset) => (
+        <Card key={asset.id} className="overflow-hidden group border-muted">
+          <div className="aspect-video bg-muted relative">
+            {asset.asset_type === "video" ? (
+              <div className="flex items-center justify-center h-full bg-slate-200">
+                <FileVideo className="h-8 w-8 text-slate-500" />
+              </div>
+            ) : (
+              <img src={asset.file_url} className="w-full h-full object-cover" alt={asset.name} />
+            )}
 
-  const handleFiles = (files: FileList) => {
-    Array.from(files).forEach(file => {
-      const isVideo = file.type.startsWith("video/");
-      const newAsset: Asset = {
-        id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-        name: file.name,
-        type: isVideo ? "video" : "image",
-        url: URL.createObjectURL(file),
-        size: formatFileSize(file.size),
-        uploadedAt: new Date().toISOString().split("T")[0],
-        usedIn: []
-      };
-      setAssets(prev => [newAsset, ...prev]);
-    });
-    toast.success(`${files.length} file(s) uploaded successfully`);
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
-
-  const deleteAsset = (id: string) => {
-    setAssets(prev => prev.filter(a => a.id !== id));
-    toast.success("Asset deleted");
-  };
-
-  const AssetCard = ({ asset }: { asset: Asset }) => (
-    <Card className="overflow-hidden group hover:shadow-md transition-shadow">
-      <div className="relative aspect-video bg-muted">
-        {asset.type === "image" ? (
-          <img 
-            src={asset.url} 
-            alt={asset.name}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = "https://placehold.co/400x300?text=Image";
-            }}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-charcoal/10">
-            <Video className="w-12 h-12 text-muted-foreground" />
+            {/* Overlay Actions */}
+            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition-all duration-200">
+              <Button size="icon" variant="secondary" onClick={() => setSelectedAsset(asset)} title="View">
+                <Eye className="h-4 w-4" />
+              </Button>
+              <Button size="icon" variant="secondary" onClick={() => copyUrl(asset.file_url)} title="Copy URL">
+                <Copy className="h-4 w-4" />
+              </Button>
+              <Button size="icon" variant="destructive" onClick={() => deleteAsset(asset.id)} title="Delete">
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+            <Badge className="absolute top-1 left-1 text-[10px] uppercase pointer-events-none">
+              {asset.asset_type}
+            </Badge>
           </div>
-        )}
-        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-          <Button 
-            size="icon" 
-            variant="secondary" 
-            className="h-8 w-8"
-            onClick={() => setSelectedAsset(asset)}
-          >
-            <Eye className="h-4 w-4" />
-          </Button>
-          <Button 
-            size="icon" 
-            variant="secondary" 
-            className="h-8 w-8"
-            onClick={() => copyUrl(asset.url)}
-          >
-            <Copy className="h-4 w-4" />
-          </Button>
-          <Button 
-            size="icon" 
-            variant="destructive" 
-            className="h-8 w-8"
-            onClick={() => deleteAsset(asset.id)}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-        <Badge 
-          variant="secondary" 
-          className="absolute top-2 right-2 text-xs"
-        >
-          {asset.type === "image" ? <FileImage className="w-3 h-3 mr-1" /> : <FileVideo className="w-3 h-3 mr-1" />}
-          {asset.type}
-        </Badge>
-      </div>
-      <CardContent className="p-3 space-y-2">
-        <div className="flex items-start justify-between gap-2">
-          <h4 className="font-medium text-sm truncate flex-1" title={asset.name}>
-            {asset.name}
-          </h4>
-          <span className="text-xs text-muted-foreground whitespace-nowrap">{asset.size}</span>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span>{asset.uploadedAt}</span>
-        </div>
-        {asset.usedIn.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {asset.usedIn.map((usage, idx) => (
-              <Badge key={idx} variant="outline" className="text-xs py-0">
-                {usage}
-              </Badge>
-            ))}
+          <div className="p-2 space-y-1">
+            <p className="text-[11px] font-medium truncate" title={asset.name}>{asset.name}</p>
+            <p className="text-[10px] text-muted-foreground">{asset.size_mb} MB</p>
           </div>
-        )}
-        {asset.usedIn.length === 0 && (
-          <Badge variant="secondary" className="text-xs py-0 bg-yellow-100 text-yellow-800">
-            Not in use
-          </Badge>
-        )}
-      </CardContent>
-    </Card>
+        </Card>
+      ))}
+    </div>
   );
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl lg:text-3xl font-serif font-semibold text-charcoal">Asset Manager</h1>
-        <p className="text-muted-foreground">Upload and manage images & videos with auto-generated URLs</p>
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      <div className="flex justify-between items-end">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Asset Manager</h1>
+          <p className="text-muted-foreground">Manage and track your media storage.</p>
+        </div>
+        <div className="bg-slate-100 px-4 py-2 rounded-lg border text-right">
+          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Usage</p>
+          <p className="text-xl font-bold text-primary">{totalMemory} MB</p>
+        </div>
       </div>
 
-      {/* Upload Section */}
-      <Card className="border-0 shadow-sm">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Upload className="w-5 h-5" />
-            Upload Assets
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div
-            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-              dragActive ? "border-primary bg-primary/5" : "border-muted-foreground/25 hover:border-primary/50"
-            }`}
-            onDragEnter={handleDrag}
-            onDragLeave={handleDrag}
-            onDragOver={handleDrag}
-            onDrop={handleDrop}
-          >
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                <Upload className="w-8 h-8 text-primary" />
-              </div>
-              <div>
-                <p className="font-medium">Drag & drop files here</p>
-                <p className="text-sm text-muted-foreground">or click to browse</p>
-              </div>
-              <Input
-                type="file"
-                multiple
-                accept="image/*,video/*"
-                className="hidden"
-                id="file-upload"
-                onChange={(e) => e.target.files && handleFiles(e.target.files)}
-              />
-              <Button asChild variant="outline">
-                <label htmlFor="file-upload" className="cursor-pointer">
-                  Browse Files
-                </label>
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                Supported: JPG, PNG, WEBP, GIF, MP4, MOV (Max 50MB)
-              </p>
-            </div>
-          </div>
+      {/* Upload Zone */}
+      <Card className="border-2 border-dashed border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors">
+        <CardContent className="py-10">
+          <input
+            type="file" multiple id="file-up" className="hidden"
+            onChange={(e) => e.target.files && handleFiles(e.target.files)}
+          />
+          <label htmlFor="file-up" className="flex flex-col items-center cursor-pointer">
+            <Upload className="h-10 w-10 text-primary mb-3" />
+            <span className="font-medium">Click to upload or drag files here</span>
+            <span className="text-xs text-muted-foreground mt-1">Images, Videos, GIFs</span>
+          </label>
         </CardContent>
       </Card>
 
-      {/* Asset Library */}
-      <Card className="border-0 shadow-sm">
-        <CardHeader>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <CardTitle className="flex items-center gap-2">
-              <Image className="w-5 h-5" />
-              Asset Library
-              <Badge variant="secondary">{assets.length} files</Badge>
-            </CardTitle>
-            <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Search assets or usage..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="all">
-            <TabsList className="mb-4">
-              <TabsTrigger value="all">All ({filteredAssets.length})</TabsTrigger>
-              <TabsTrigger value="images">Images ({imageAssets.length})</TabsTrigger>
-              <TabsTrigger value="videos">Videos ({videoAssets.length})</TabsTrigger>
-            </TabsList>
+      {/* Toolbar & Content */}
+      <div className="space-y-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search assets..."
+            className="pl-10"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
 
+        <Tabs defaultValue="all" className="w-full">
+          <TabsList className="bg-muted/50">
+            <TabsTrigger value="all">All Assets</TabsTrigger>
+            <TabsTrigger value="image">Images</TabsTrigger>
+            <TabsTrigger value="video">Videos</TabsTrigger>
+            <TabsTrigger value="gif">GIFs</TabsTrigger>
+          </TabsList>
+
+          <div className="mt-4">
             <TabsContent value="all">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {filteredAssets.map(asset => (
-                  <AssetCard key={asset.id} asset={asset} />
-                ))}
-              </div>
-              {filteredAssets.length === 0 && (
-                <div className="text-center py-12 text-muted-foreground">
-                  No assets found matching your search
-                </div>
-              )}
+              <AssetGrid items={filteredAssets} />
             </TabsContent>
-
-            <TabsContent value="images">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {imageAssets.map(asset => (
-                  <AssetCard key={asset.id} asset={asset} />
-                ))}
-              </div>
+            <TabsContent value="image">
+              <AssetGrid items={filteredAssets.filter(a => a.asset_type === 'image')} />
             </TabsContent>
-
-            <TabsContent value="videos">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {videoAssets.map(asset => (
-                  <AssetCard key={asset.id} asset={asset} />
-                ))}
-              </div>
+            <TabsContent value="video">
+              <AssetGrid items={filteredAssets.filter(a => a.asset_type === 'video')} />
             </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+            <TabsContent value="gif">
+              <AssetGrid items={filteredAssets.filter(a => a.asset_type === 'gif')} />
+            </TabsContent>
+          </div>
+        </Tabs>
 
-      {/* Asset Preview Modal */}
+        {filteredAssets.length === 0 && !isLoading && (
+          <div className="text-center py-20 bg-slate-50 border rounded-xl">
+            <p className="text-muted-foreground">No assets found matching your criteria.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Full Preview Modal */}
       {selectedAsset && (
-        <div 
-          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
-          onClick={() => setSelectedAsset(null)}
-        >
-          <div 
-            className="bg-background rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between p-4 border-b">
-              <h3 className="font-semibold">{selectedAsset.name}</h3>
-              <Button size="icon" variant="ghost" onClick={() => setSelectedAsset(null)}>
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-            <div className="p-4">
-              {selectedAsset.type === "image" ? (
-                <img 
-                  src={selectedAsset.url} 
-                  alt={selectedAsset.name}
-                  className="w-full max-h-[60vh] object-contain rounded"
-                />
+        <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setSelectedAsset(null)}>
+          <div className="bg-background rounded-xl max-w-4xl w-full overflow-hidden shadow-2xl relative" onClick={e => e.stopPropagation()}>
+            <Button size="icon" variant="ghost" className="absolute right-4 top-4 z-10 bg-white/10 hover:bg-white/20 text-white rounded-full" onClick={() => setSelectedAsset(null)}>
+              <X className="h-5 w-5" />
+            </Button>
+
+            <div className="bg-slate-900 flex items-center justify-center min-h-[300px] max-h-[70vh]">
+              {selectedAsset.asset_type === 'video' ? (
+                <video src={selectedAsset.file_url} controls className="max-w-full max-h-full" autoPlay />
               ) : (
-                <video 
-                  src={selectedAsset.url} 
-                  controls 
-                  className="w-full max-h-[60vh] rounded"
-                />
+                <img src={selectedAsset.file_url} className="max-w-full max-h-full object-contain" alt="" />
               )}
-              <div className="mt-4 space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">URL:</span>
-                  <code className="flex-1 text-sm bg-muted px-2 py-1 rounded truncate">
-                    {selectedAsset.url}
-                  </code>
-                  <Button size="sm" variant="outline" onClick={() => copyUrl(selectedAsset.url)}>
-                    <Copy className="w-4 h-4 mr-1" /> Copy
-                  </Button>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">Size:</span>
-                  <span className="text-sm">{selectedAsset.size}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">Uploaded:</span>
-                  <span className="text-sm">{selectedAsset.uploadedAt}</span>
-                </div>
-                <div>
-                  <span className="text-sm font-medium">Used in:</span>
-                  <div className="flex flex-wrap gap-2 mt-1">
-                    {selectedAsset.usedIn.length > 0 ? (
-                      selectedAsset.usedIn.map((usage, idx) => (
-                        <Badge key={idx} variant="outline">
-                          <ExternalLink className="w-3 h-3 mr-1" />
-                          {usage}
-                        </Badge>
-                      ))
-                    ) : (
-                      <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
-                        Not currently in use
-                      </Badge>
-                    )}
-                  </div>
-                </div>
+            </div>
+
+            <div className="p-6 flex justify-between items-center bg-card">
+              <div>
+                <h3 className="font-bold text-lg">{selectedAsset.name}</h3>
+                <p className="text-sm text-muted-foreground">Original File URL: <span className="underline break-all">{selectedAsset.file_url}</span></p>
               </div>
+              <Button onClick={() => copyUrl(selectedAsset.file_url)} className="shrink-0">
+                <Copy className="mr-2 h-4 w-4" /> Copy Direct Link
+              </Button>
             </div>
           </div>
         </div>

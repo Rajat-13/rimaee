@@ -1,7 +1,10 @@
-from django.urls import path
-from .views import AssetListCreateView, AssetDetailView
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import AssetViewSet  # Import the ViewSet we created
+
+router = DefaultRouter()
+router.register(r'', AssetViewSet, basename='asset')
 
 urlpatterns = [
-    path('', AssetListCreateView.as_view()),
-    path('<uuid:pk>/', AssetDetailView.as_view()),
+    path('', include(router.urls)),
 ]
