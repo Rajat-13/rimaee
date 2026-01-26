@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import TrustBadges from "@/components/TrustBadges";
 import { allProducts, categories, genderOptions, Product } from "@/data/products";
 import { useWishlist } from "@/context/WishlistContext";
+import { ProductGridShimmer } from "@/components/ui/shimmer";
 import {
   Sheet,
   SheetContent,
@@ -42,13 +43,17 @@ const AllProducts = () => {
   );
   const [recentlyViewed, setRecentlyViewed] = useState<string[]>([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load recently viewed from localStorage
+  // Simulate initial loading and load recently viewed
   useEffect(() => {
     const stored = localStorage.getItem("recentlyViewed");
     if (stored) {
       setRecentlyViewed(JSON.parse(stored));
     }
+    // Simulate loading delay for shimmer demonstration
+    const timer = setTimeout(() => setIsLoading(false), 300);
+    return () => clearTimeout(timer);
   }, []);
   
   // Update filters when URL params change
@@ -125,18 +130,26 @@ const AllProducts = () => {
 
   const ProductGridItem = ({ product }: { product: Product }) => {
     const isWishlisted = isInWishlist(product.id);
+    const [imageLoaded, setImageLoaded] = useState(false);
 
     return (
-      <div className="group relative">
+      <div className="group relative hover-lift gpu-accelerated">
         <Link to={`/products/${product.slug}`} className="block">
-          <div className="relative aspect-square overflow-hidden bg-muted">
+          <div className="relative aspect-square overflow-hidden bg-muted rounded-sm">
+            {!imageLoaded && (
+              <div className="absolute inset-0 bg-muted animate-pulse" />
+            )}
             <img
               src={product.image}
               alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className={`w-full h-full object-cover transition-all duration-500 ease-out group-hover:scale-105 ${
+                imageLoaded ? "opacity-100" : "opacity-0"
+              }`}
+              onLoad={() => setImageLoaded(true)}
+              loading="lazy"
             />
             {product.tag && (
-              <span className="absolute top-3 left-3 bg-primary text-primary-foreground text-xs uppercase tracking-wider px-3 py-1">
+              <span className="absolute top-3 left-3 bg-primary text-primary-foreground text-xs uppercase tracking-wider px-3 py-1 rounded-sm">
                 {product.tag}
               </span>
             )}
@@ -152,21 +165,21 @@ const AllProducts = () => {
                   slug: product.slug,
                 });
               }}
-              className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 ${
+              className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 ease-out touch-target ${
                 isWishlisted
-                  ? "bg-red-500 text-white"
-                  : "bg-white/90 text-foreground hover:bg-white hover:text-red-500"
+                  ? "bg-destructive text-destructive-foreground"
+                  : "bg-background/90 text-foreground hover:bg-background hover:text-destructive"
               }`}
             >
               <Heart className={`w-4 h-4 ${isWishlisted ? "fill-current" : ""}`} />
             </button>
           </div>
           <div className="p-4 text-center">
-            <h3 className="font-serif text-lg font-medium mb-2 group-hover:text-primary transition-colors">
+            <h3 className="font-serif text-lg font-medium mb-2 group-hover:text-primary transition-colors duration-300">
               {product.name}
             </h3>
             <div className="flex items-center justify-center gap-3">
-              <span className="text-lg font-medium">₹{product.price}</span>
+              <span className="text-lg font-medium text-foreground">₹{product.price}</span>
               {product.originalPrice && (
                 <span className="text-muted-foreground line-through text-sm">
                   ₹{product.originalPrice}
@@ -445,7 +458,9 @@ const AllProducts = () => {
           )}
 
           {/* Product Grid */}
-          {filteredProducts.length > 0 ? (
+          {isLoading ? (
+            <ProductGridShimmer count={8} />
+          ) : filteredProducts.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
               {filteredProducts.map((product) => (
                 <ProductGridItem key={product.id} product={product} />
