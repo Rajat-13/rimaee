@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { useWishlist } from "@/context/WishlistContext";
+import { Shimmer } from "./ui/shimmer";
 
 interface Product {
   id: number | string;
@@ -18,6 +20,7 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const { toggleItem, isInWishlist } = useWishlist();
+  const [imageLoaded, setImageLoaded] = useState(false);
   
   const slug = product.slug || product.name.toLowerCase().replace(/\s+/g, '-');
   const productId = String(product.id);
@@ -39,17 +42,24 @@ const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <Link 
       to={`/products/${slug}`}
-      className="card-product group cursor-pointer min-w-[280px] md:min-w-[300px] block"
+      className="card-product group cursor-pointer min-w-[280px] md:min-w-[300px] block hover-lift gpu-accelerated"
     >
       {/* Image Container */}
       <div className="relative aspect-square overflow-hidden bg-muted">
+        {!imageLoaded && (
+          <Shimmer className="absolute inset-0" />
+        )}
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className={`w-full h-full object-cover transition-all duration-500 ease-out group-hover:scale-105 ${
+            imageLoaded ? "opacity-100" : "opacity-0"
+          }`}
+          onLoad={() => setImageLoaded(true)}
+          loading="lazy"
         />
         {product.tag && (
-          <span className="absolute top-3 left-3 bg-primary text-primary-foreground text-xs uppercase tracking-wider px-3 py-1">
+          <span className="absolute top-3 left-3 bg-primary text-primary-foreground text-xs uppercase tracking-wider px-3 py-1 rounded-sm">
             {product.tag}
           </span>
         )}
@@ -57,10 +67,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
         {/* Wishlist Button */}
         <button
           onClick={handleWishlistClick}
-          className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 ${
+          className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 ease-out touch-target ${
             isWishlisted 
-              ? "bg-red-500 text-white" 
-              : "bg-white/90 text-foreground hover:bg-white hover:text-red-500"
+              ? "bg-destructive text-destructive-foreground" 
+              : "bg-background/90 text-foreground hover:bg-background hover:text-destructive"
           }`}
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
         >
@@ -73,11 +83,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
       {/* Content */}
       <div className="p-4 text-center">
-        <h3 className="font-serif text-lg font-medium mb-2 group-hover:text-primary transition-colors">
+        <h3 className="font-serif text-lg font-medium mb-2 group-hover:text-primary transition-colors duration-300">
           {product.name}
         </h3>
         <div className="flex items-center justify-center gap-3">
-          <span className="text-lg font-medium">₹{product.price}</span>
+          <span className="text-lg font-medium text-foreground">₹{product.price}</span>
           {product.originalPrice && (
             <span className="text-muted-foreground line-through text-sm">
               ₹{product.originalPrice}
