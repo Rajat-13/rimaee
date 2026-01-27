@@ -4,7 +4,7 @@ MVVM: ViewModel Layer
 """
 from rest_framework import serializers
 from .models import Order, OrderItem, Coupon, Cart, CartItem, Wishlist
-from apps.products.serializers import ProductListSerializer
+from apps.products.serializers import ProductSerializer
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
@@ -79,7 +79,7 @@ class CouponSerializer(serializers.ModelSerializer):
 
 
 class CartItemSerializer(serializers.ModelSerializer):
-    product = ProductListSerializer(read_only=True)
+    product = ProductSerializer(read_only=True)
     product_id = serializers.UUIDField(write_only=True)
     variant_id = serializers.UUIDField(write_only=True, required=False)
     
@@ -105,7 +105,7 @@ class CartSerializer(serializers.ModelSerializer):
 
 
 class WishlistSerializer(serializers.ModelSerializer):
-    product = ProductListSerializer(read_only=True)
+    product = ProductSerializer(read_only=True)
     product_id = serializers.UUIDField(write_only=True)
     
     class Meta:

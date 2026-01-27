@@ -53,18 +53,6 @@ CREATE TABLE IF NOT EXISTS addresses (
 );
 
 -- 2. PRODUCTS
-CREATE TABLE IF NOT EXISTS categories (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(100) NOT NULL,
-    slug VARCHAR(100) UNIQUE NOT NULL,
-    description TEXT,
-    image VARCHAR(255),
-    parent_id UUID REFERENCES categories(id) ON DELETE CASCADE,
-    is_active BOOLEAN DEFAULT TRUE,
-    sort_order INTEGER DEFAULT 0,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
 CREATE TABLE IF NOT EXISTS products (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     sku VARCHAR(50) UNIQUE NOT NULL,
@@ -73,7 +61,7 @@ CREATE TABLE IF NOT EXISTS products (
     description TEXT NOT NULL,
     short_description VARCHAR(500),
     product_type VARCHAR(20) DEFAULT 'fragrance' CHECK (product_type IN ('fragrance', 'accessory')),
-    category_id UUID REFERENCES categories(id) ON DELETE SET NULL,
+    category VARCHAR(100),
     gender VARCHAR(10) DEFAULT 'unisex' CHECK (gender IN ('male', 'female', 'unisex')),
     price DECIMAL(10,2) NOT NULL,
     compare_at_price DECIMAL(10,2),
@@ -97,14 +85,15 @@ CREATE TABLE IF NOT EXISTS products (
 CREATE TABLE IF NOT EXISTS product_variants (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     product_id UUID REFERENCES products(id) ON DELETE CASCADE,
-    sku VARCHAR(50) UNIQUE NOT NULL,
+    sku VARCHAR(50) NOT NULL,
     name VARCHAR(100) NOT NULL,
     size VARCHAR(50),
     price DECIMAL(10,2) NOT NULL,
     compare_at_price DECIMAL(10,2),
     cost_price DECIMAL(10,2) DEFAULT 0,
     is_active BOOLEAN DEFAULT TRUE,
-    sort_order INTEGER DEFAULT 0
+    sort_order INTEGER DEFAULT 0,
+    UNIQUE(product_id, sku)
 );
 
 CREATE TABLE IF NOT EXISTS product_images (
@@ -352,7 +341,7 @@ CREATE TABLE IF NOT EXISTS assets (
 );
 
 -- INDEXES
-CREATE INDEX idx_products_category ON products(category_id);
+CREATE INDEX idx_products_category ON products(category);
 CREATE INDEX idx_products_type ON products(product_type);
 CREATE INDEX idx_orders_user ON orders(user_id);
 CREATE INDEX idx_orders_status ON orders(status);
