@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { allProducts } from "@/data/products";
+import { productRepository, FrontendProduct } from "@/repositories/productRepository";
 import AnimatedHeader from "./AnimatedHeader";
 import ScrollReveal from "./ScrollReveal";
 
@@ -41,9 +42,28 @@ const AUTO_SCROLL_DELAY = 3000;
 const WinterPicksSection = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isHovered = useRef(false);
-
-  const featuredProducts = allProducts.slice(0, 4);
+  const [apiProducts, setApiProducts] = useState<FrontendProduct[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+
+  // Fetch products from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await productRepository.list();
+        if (data.length > 0) {
+          setApiProducts(data.slice(0, 4));
+        }
+      } catch (err) {
+        console.error("Failed to fetch products for winter picks:", err);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  // Use API products or fallback
+  const featuredProducts = apiProducts.length > 0 
+    ? apiProducts 
+    : allProducts.slice(0, 4);
 
   // 🔁 Auto-scroll
   useEffect(() => {

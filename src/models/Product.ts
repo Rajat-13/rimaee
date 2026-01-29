@@ -7,6 +7,12 @@ export interface ProductVariant {
   price: number;
 }
 
+export const genderOptions = [
+  { id: "male", name: "Male" },
+  { id: "female", name: "Female" },
+  { id: "unisex", name: "Unisex" },
+];
+
 export interface Concentration {
   sillage: number;
   projection: number;
@@ -19,22 +25,36 @@ export interface Notes {
   base: string[];
 }
 
+export interface ProductImage {
+  image?: string;
+  images?: string[];
+}
+
 export interface Product {
   id: string;
   name: string;
   sku: string;
+  slug: string;
+
   type: "perfume" | "attar";
-  category: string;
+  category?: string;
   gender: "male" | "female" | "unisex";
+
   isActive: boolean;
-  price: number;
-  images?: string[];
+
   variants: ProductVariant[];
+  product_images?: ProductImage[];
+
   description?: string;
   notes?: Notes;
-  concentration?: Concentration;
+
+  sillage?: number;
+  projection?: number;
+  longevity?: number;
+
   occasion?: string;
   tag?: string;
+
   maxOrderThreshold?: number;
   stockID?: number;
 }

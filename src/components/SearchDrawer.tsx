@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, X, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import {
   Drawer,
   DrawerClose,
@@ -9,6 +10,7 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { productRepository, FrontendProduct } from "@/repositories/productRepository";
 
 interface SearchDrawerProps {
   open: boolean;
@@ -24,34 +26,62 @@ const popularSearches = [
   "Summer scents",
 ];
 
-const trendingProducts = [
-  {
-    id: 1,
-    name: "Midnight Oud",
-    price: 1999,
-    image: "https://images.unsplash.com/photo-1541643600914-78b084683601?w=100&h=100&fit=crop",
-  },
-  {
-    id: 2,
-    name: "Rose Garden",
-    price: 1499,
-    image: "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=100&h=100&fit=crop",
-  },
-  {
-    id: 3,
-    name: "Ocean Breeze",
-    price: 1299,
-    image: "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=100&h=100&fit=crop",
-  },
-];
-
 const SearchDrawer = ({ open, onOpenChange }: SearchDrawerProps) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<FrontendProduct[]>([]);
+  const [trendingProducts, setTrendingProducts] = useState<FrontendProduct[]>([]);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  // Fetch trending products on mount
+  useEffect(() => {
+    const fetchTrending = async () => {
+      try {
+        const products = await productRepository.list();
+        // Get first 3 products as trending
+        setTrendingProducts(products.slice(0, 3));
+      } catch (err) {
+        console.error("Failed to fetch trending products:", err);
+      }
+    };
+    if (open) {
+      fetchTrending();
+    }
+  }, [open]);
+
+  // Search products when query changes
+  useEffect(() => {
+    const searchProducts = async () => {
+      if (!searchQuery.trim()) {
+        setSearchResults([]);
+        return;
+      }
+      
+      setLoading(true);
+      try {
+        const results = await productRepository.search(searchQuery);
+        setSearchResults(results.slice(0, 5));
+      } catch (err) {
+        console.error("Failed to search products:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const debounce = setTimeout(searchProducts, 300);
+    return () => clearTimeout(debounce);
+  }, [searchQuery]);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    // Add search logic here
   };
+
+  const handleProductClick = (slug: string) => {
+    onOpenChange(false);
+    navigate(`/products/${slug}`);
+  };
+
+  const displayProducts = searchQuery.trim() ? searchResults : trendingProducts;
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -82,35 +112,49 @@ const SearchDrawer = ({ open, onOpenChange }: SearchDrawerProps) => {
           
           <div className="p-6 overflow-y-auto max-h-[60vh]">
             {/* Popular Searches */}
-            <div className="mb-8">
-              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-4">
-                Popular Searches
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {popularSearches.map((term) => (
-                  <button
-                    key={term}
-                    onClick={() => handleSearch(term)}
-                    className="px-4 py-2 bg-muted rounded-full text-sm hover:bg-primary hover:text-primary-foreground transition-colors"
-                  >
-                    {term}
-                  </button>
-                ))}
+            {!searchQuery.trim() && (
+              <div className="mb-8">
+                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-4">
+                  Popular Searches
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {popularSearches.map((term) => (
+                    <button
+                      key={term}
+                      onClick={() => handleSearch(term)}
+                      className="px-4 py-2 bg-muted rounded-full text-sm hover:bg-primary hover:text-primary-foreground transition-colors"
+                    >
+                      {term}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
             
-            {/* Trending Products */}
+            {/* Products */}
             <div>
               <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-4">
-                Trending Now
+                {searchQuery.trim() ? `Results for "${searchQuery}"` : "Trending Now"}
               </h3>
+              
+              {loading && (
+                <div className="text-center py-4 text-muted-foreground">
+                  Searching...
+                </div>
+              )}
+              
+              {!loading && displayProducts.length === 0 && searchQuery.trim() && (
+                <div className="text-center py-4 text-muted-foreground">
+                  No products found
+                </div>
+              )}
+              
               <div className="space-y-4">
-                {trendingProducts.map((product) => (
-                  <a
+                {displayProducts.map((product) => (
+                  <button
                     key={product.id}
-                    href={`/products/${product.name.toLowerCase().replace(/\s+/g, '-')}`}
-                    className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted transition-colors group"
-                    onClick={() => onOpenChange(false)}
+                    onClick={() => handleProductClick(product.slug)}
+                    className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted transition-colors group w-full text-left"
                   >
                     <img
                       src={product.image}
@@ -122,7 +166,7 @@ const SearchDrawer = ({ open, onOpenChange }: SearchDrawerProps) => {
                       <p className="text-sm text-muted-foreground">₹{product.price}</p>
                     </div>
                     <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                  </a>
+                  </button>
                 ))}
               </div>
             </div>

@@ -3,106 +3,79 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AnimatedHeader from "./AnimatedHeader";
 import ScrollReveal from "./ScrollReveal";
-
-const perfumeProducts = [
-  {
-    id: 1,
-    name: "Purple Mystique",
-    price: 499,
-    originalPrice: 799,
-    image: "https://images.unsplash.com/photo-1594035900144-17fc72a68908?w=600&auto=format&fit=crop&q=80",
-    tag: "Bestseller",
-  },
-  {
-    id: 2,
-    name: "Ocean Breeze",
-    price: 599,
-    image: "https://images.unsplash.com/photo-1541643600914-78b084683601?w=600&auto=format&fit=crop&q=80",
-  },
-  {
-    id: 3,
-    name: "Midnight Rose",
-    price: 549,
-    originalPrice: 899,
-    image: "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=600&auto=format&fit=crop&q=80",
-    tag: "Sale",
-  },
-  {
-    id: 4,
-    name: "Fresh Citrus",
-    price: 449,
-    image: "https://images.unsplash.com/photo-1595535873420-a599195b3f4a?w=600&auto=format&fit=crop&q=80",
-  },
-  {
-    id: 5,
-    name: "Woody Essence",
-    price: 699,
-    image: "https://images.unsplash.com/photo-1587017539504-67cfbddac569?w=600&auto=format&fit=crop&q=80",
-  },
-  {
-    id: 6,
-    name: "Floral Dreams",
-    price: 549,
-    image: "https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?w=600&auto=format&fit=crop&q=80",
-  },
-];
-
-const attarProducts = [
-  {
-    id: 101,
-    name: "Royal Oudh Attar",
-    price: 799,
-    originalPrice: 999,
-    image: "https://images.unsplash.com/photo-1590736969955-71cc94901144?w=600&auto=format&fit=crop&q=80",
-    tag: "Premium",
-  },
-  {
-    id: 102,
-    name: "Sandal Pure",
-    price: 649,
-    image: "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&auto=format&fit=crop&q=80",
-  },
-  {
-    id: 103,
-    name: "Rose Absolute",
-    price: 549,
-    image: "https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?w=600&auto=format&fit=crop&q=80",
-    tag: "Bestseller",
-  },
-  {
-    id: 104,
-    name: "Musk White",
-    price: 499,
-    image: "https://images.unsplash.com/photo-1541643600914-78b084683601?w=600&auto=format&fit=crop&q=80",
-  },
-  {
-    id: 105,
-    name: "Amber Gold",
-    price: 699,
-    originalPrice: 899,
-    image: "https://images.unsplash.com/photo-1547887538-e3a2f32cb1cc?w=600&auto=format&fit=crop&q=80",
-    tag: "Sale",
-  },
-  {
-    id: 106,
-    name: "Jasmine Night",
-    price: 599,
-    image: "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=600&auto=format&fit=crop&q=80",
-  },
-];
+import { productRepository, FrontendProduct } from "@/repositories/productRepository";
+import { allProducts as fallbackProducts } from "@/data/products";
 
 const BestsellersSection = () => {
   const [activeTab, setActiveTab] = useState<"perfume" | "attar">("perfume");
   const [activeIndex, setActiveIndex] = useState(2);
+  const [apiProducts, setApiProducts] = useState<FrontendProduct[]>([]);
+  const [loading, setLoading] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  // Fetch products from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await productRepository.list();
+        if (data.length > 0) {
+          setApiProducts(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch products for bestsellers:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  // Filter products by type
+  const perfumeProducts = apiProducts.length > 0 
+    ? apiProducts.filter(p => p.type === "perfume" || !p.type).slice(0, 6)
+    : fallbackProducts.filter(p => p.category !== "attar").slice(0, 6).map(p => ({
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        price: p.price,
+        originalPrice: p.originalPrice,
+        image: p.image,
+        images: p.images,
+        tag: p.tag,
+        gender: p.gender,
+        category: p.category,
+        notes: p.notes,
+        description: p.description,
+        occasion: p.occasion,
+        concentration: p.concentration,
+      }));
+
+  const attarProducts = apiProducts.length > 0
+    ? apiProducts.filter(p => p.type === "attar").slice(0, 6)
+    : fallbackProducts.slice(0, 6).map(p => ({
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        price: p.price,
+        originalPrice: p.originalPrice,
+        image: p.image,
+        images: p.images,
+        tag: p.tag,
+        gender: p.gender,
+        category: p.category,
+        notes: p.notes,
+        description: p.description,
+        occasion: p.occasion,
+        concentration: p.concentration,
+      }));
 
   const products = activeTab === "perfume" ? perfumeProducts : attarProducts;
 
   // Reset to center card when tab changes
   useEffect(() => {
-    setActiveIndex(2);
-  }, [activeTab]);
+    setActiveIndex(Math.min(2, products.length - 1));
+  }, [activeTab, products.length]);
 
   const scroll = (direction: "left" | "right") => {
     const newIndex = direction === "left"
@@ -133,6 +106,10 @@ const BestsellersSection = () => {
      zIndex,
    };
  };
+
+  if (products.length === 0 && !loading) {
+    return null;
+  }
 
   return (
     <section id="bestsellers" className="section-padding bg-background overflow-hidden">
@@ -230,7 +207,7 @@ const BestsellersSection = () => {
             >
               <div className="relative flex items-center justify-center" style={{ transformStyle: "preserve-3d" }}>
                 {products.map((product, index) => {
-                  const slug = product.name.toLowerCase().replace(/\s+/g, '-');
+                  const slug = product.slug || product.name.toLowerCase().replace(/\s+/g, '-');
                   return (
                     <div
                       key={product.id}

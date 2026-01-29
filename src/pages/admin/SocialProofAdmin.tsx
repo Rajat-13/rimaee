@@ -7,9 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Save, Eye, Search } from "lucide-react";
-import { allProducts } from "@/data/products";
+import { allProducts as fallbackProducts } from "@/data/products";
+import { productRepository, FrontendProduct } from "@/repositories/productRepository";
 import { toast } from "sonner";
-import type { PopupPlacement } from "@/components/SocialProofPopup";
+import { PopupPlacement } from "@/components/SocialProofPopup";
 
 interface SocialProofSettings {
   enabled: boolean;
@@ -19,14 +20,73 @@ interface SocialProofSettings {
 }
 
 const SocialProofAdmin = () => {
+  const [products, setProducts] = useState<FrontendProduct[]>([]);
   const [settings, setSettings] = useState<SocialProofSettings>({
     enabled: true,
-    selectedProductIds: allProducts.slice(0, 5).map(p => p.id),
+    selectedProductIds: [],
     intervalPattern: [5, 3, 5, 3], // in minutes
     placement: "bottom-left",
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [previewVisible, setPreviewVisible] = useState(false);
+
+  // Fetch products from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await productRepository.list();
+        if (data.length > 0) {
+          setProducts(data);
+          // Initialize selected products if none saved
+          const saved = localStorage.getItem("socialProofSettings");
+          if (!saved) {
+            setSettings(prev => ({
+              ...prev,
+              selectedProductIds: data.slice(0, 5).map(p => p.id),
+            }));
+          }
+        } else {
+          // Use fallback
+          setProducts(fallbackProducts.map(p => ({
+            id: p.id,
+            name: p.name,
+            slug: p.slug,
+            price: p.price,
+            originalPrice: p.originalPrice,
+            image: p.image,
+            images: p.images,
+            tag: p.tag,
+            gender: p.gender,
+            category: p.category,
+            notes: p.notes,
+            description: p.description,
+            occasion: p.occasion,
+            concentration: p.concentration,
+          })));
+        }
+      } catch (err) {
+        console.error("Failed to fetch products:", err);
+        // Use fallback
+        setProducts(fallbackProducts.map(p => ({
+          id: p.id,
+          name: p.name,
+          slug: p.slug,
+          price: p.price,
+          originalPrice: p.originalPrice,
+          image: p.image,
+          images: p.images,
+          tag: p.tag,
+          gender: p.gender,
+          category: p.category,
+          notes: p.notes,
+          description: p.description,
+          occasion: p.occasion,
+          concentration: p.concentration,
+        })));
+      }
+    };
+    fetchProducts();
+  }, []);
 
   useEffect(() => {
     const saved = localStorage.getItem("socialProofSettings");
@@ -61,7 +121,7 @@ const SocialProofAdmin = () => {
   const selectAll = () => {
     setSettings(prev => ({
       ...prev,
-      selectedProductIds: allProducts.map(p => p.id),
+      selectedProductIds: products.map(p => p.id),
     }));
   };
 
@@ -79,7 +139,7 @@ const SocialProofAdmin = () => {
     }));
   };
 
-  const filteredProducts = allProducts.filter(p =>
+  const filteredProducts = products.filter(p =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -272,7 +332,7 @@ const SocialProofAdmin = () => {
               <div className="flex items-center gap-3 p-3">
                 <div className="relative w-16 h-16 flex-shrink-0">
                   <img
-                    src={allProducts[0]?.image}
+                    src={products[0]?.image}
                     alt="Preview"
                     className="w-full h-full object-cover rounded-lg"
                   />
@@ -286,7 +346,7 @@ const SocialProofAdmin = () => {
                     just purchased this!
                   </p>
                   <p className="text-sm text-primary font-semibold truncate">
-                    {allProducts[0]?.name}
+                    {products[0]?.name}
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     2 minutes ago

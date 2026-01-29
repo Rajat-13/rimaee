@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     # Local apps
     'apps.accounts',
     'apps.products',
+    'apps.accessories',
     'apps.orders',
     'apps.inventory',
     'apps.reviews',
@@ -120,6 +121,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:8080",
+    "http://localhost:8081",
     "https://rimaee.lovable.app",
 ]
 CORS_ALLOW_CREDENTIALS = True

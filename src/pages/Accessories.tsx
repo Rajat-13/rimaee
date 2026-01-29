@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -6,8 +6,11 @@ import TrustBadges from "@/components/TrustBadges";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
+import { accessoryRepository } from "@/repositories/accessoryRepository";
+import { Accessory } from "@/models/accessory";
 
-const accessories = [
+// Fallback data
+const fallbackAccessories = [
   {
     id: 1,
     name: "Perfume Atomizer",
@@ -55,6 +58,36 @@ const accessories = [
 const Accessories = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { addItem, setIsCartOpen } = useCart();
+  const [apiAccessories, setApiAccessories] = useState<Accessory[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch accessories from API
+  useEffect(() => {
+    const fetchAccessories = async () => {
+      try {
+        const data = await accessoryRepository.list();
+        if (data.length > 0) {
+          setApiAccessories(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch accessories:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAccessories();
+  }, []);
+
+  // Use API data or fallback
+  const accessories = apiAccessories.length > 0 
+    ? apiAccessories.map(a => ({
+        id: a.id,
+        name: a.name,
+        price: a.price,
+        image: a.image,
+        description: a.description,
+      }))
+    : fallbackAccessories;
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
@@ -110,37 +143,55 @@ const Accessories = () => {
             </div>
           </div>
           
-          <div
-            ref={scrollRef}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 md:flex md:overflow-x-auto md:scrollbar-hide pb-4 md:-mx-4 md:px-4"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-          >
-            {accessories.map((item) => (
-              <Card key={item.id} className="overflow-hidden group md:flex-shrink-0 md:w-[300px]">
-                <div className="aspect-square overflow-hidden">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
-                <CardContent className="p-4">
-                  <h3 className="font-medium text-lg mb-1">{item.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-3">{item.description}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold">₹{item.price}</span>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => handleAddToCart(item)}
-                    >
-                      Add to Cart
-                    </Button>
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+              {[1, 2, 3, 4].map((i) => (
+                <Card key={i} className="overflow-hidden animate-pulse">
+                  <div className="aspect-square bg-muted" />
+                  <CardContent className="p-4">
+                    <div className="h-5 bg-muted rounded mb-2" />
+                    <div className="h-4 bg-muted rounded w-3/4 mb-3" />
+                    <div className="flex justify-between">
+                      <div className="h-5 bg-muted rounded w-16" />
+                      <div className="h-8 bg-muted rounded w-24" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div
+              ref={scrollRef}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 md:flex md:overflow-x-auto md:scrollbar-hide pb-4 md:-mx-4 md:px-4"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            >
+              {accessories.map((item) => (
+                <Card key={item.id} className="overflow-hidden group md:flex-shrink-0 md:w-[300px]">
+                  <div className="aspect-square overflow-hidden">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  <CardContent className="p-4">
+                    <h3 className="font-medium text-lg mb-1">{item.name}</h3>
+                    <p className="text-sm text-muted-foreground mb-3">{item.description}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold">₹{item.price}</span>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => handleAddToCart(item)}
+                      >
+                        Add to Cart
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
       </main>
       <TrustBadges />

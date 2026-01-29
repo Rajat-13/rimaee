@@ -4,7 +4,8 @@ import { SlidersHorizontal, ChevronDown, X, Heart } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TrustBadges from "@/components/TrustBadges";
-import { allProducts, categories, genderOptions, Product } from "@/data/products";
+import { allProducts as fallbackProducts, categories, genderOptions, Product } from "@/data/products";
+import { productRepository, FrontendProduct } from "@/repositories/productRepository";
 import { useWishlist } from "@/context/WishlistContext";
 import { ProductGridShimmer } from "@/components/ui/shimmer";
 import {
@@ -44,16 +45,30 @@ const AllProducts = () => {
   const [recentlyViewed, setRecentlyViewed] = useState<string[]>([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [apiProducts, setApiProducts] = useState<FrontendProduct[]>([]);
 
-  // Simulate initial loading and load recently viewed
+  // Fetch products from API
   useEffect(() => {
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      try {
+        const data = await productRepository.list();
+        if (data.length > 0) {
+          setApiProducts(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch products:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProducts();
+    
+    // Load recently viewed
     const stored = localStorage.getItem("recentlyViewed");
     if (stored) {
       setRecentlyViewed(JSON.parse(stored));
     }
-    // Simulate loading delay for shimmer demonstration
-    const timer = setTimeout(() => setIsLoading(false), 300);
-    return () => clearTimeout(timer);
   }, []);
   
   // Update filters when URL params change
@@ -67,6 +82,20 @@ const AllProducts = () => {
       setViewSection("by-type");
     }
   }, [genderFromUrl, categoryFromUrl]);
+
+  // Use API products or fallback
+  const allProducts: Product[] = useMemo(() => {
+    if (apiProducts.length > 0) {
+      return apiProducts.map(p => ({
+        ...p,
+        notes: p.notes || { top: [], middle: [], base: [] },
+        description: p.description || "",
+        occasion: p.occasion || "",
+        concentration: p.concentration || { sillage: 50, projection: 50, longevity: 50 },
+      }));
+    }
+    return fallbackProducts;
+  }, [apiProducts]);
 
   const filteredProducts = useMemo(() => {
     let products = [...allProducts];

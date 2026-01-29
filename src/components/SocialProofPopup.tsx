@@ -44,10 +44,13 @@ const defaultSelectedProducts = allProducts.slice(0, 5).map(p => p.id);
 // Interval pattern in milliseconds (5,3,5,3 minutes)
 const intervalPattern = [5 * 60 * 1000, 3 * 60 * 1000, 5 * 60 * 1000, 3 * 60 * 1000];
 
+export type PopupPlacement = "bottom-left" | "bottom-right" | "top-left" | "top-right";
+
 interface SocialProofSettings {
   enabled: boolean;
   selectedProductIds: string[];
   intervalPattern: number[];
+  placement?: PopupPlacement;
 }
 
 const SocialProofPopup = () => {
@@ -62,6 +65,7 @@ const SocialProofPopup = () => {
     enabled: true,
     selectedProductIds: defaultSelectedProducts,
     intervalPattern: intervalPattern,
+    placement: "bottom-left",
   });
 
   useEffect(() => {
@@ -122,15 +126,35 @@ const SocialProofPopup = () => {
   // Don't render on admin pages
   if (isAdminPage || !currentProduct) return null;
 
+  const getPositionClasses = () => {
+    switch (settings.placement) {
+      case "bottom-right":
+        return "bottom-6 right-6";
+      case "top-left":
+        return "top-6 left-6";
+      case "top-right":
+        return "top-6 right-6";
+      default:
+        return "bottom-6 left-6";
+    }
+  };
+
+  const getAnimationProps = () => {
+    const isLeft = settings.placement?.includes("left");
+    return {
+      initial: { x: isLeft ? -100 : 100, opacity: 0 },
+      animate: { x: 0, opacity: 1 },
+      exit: { x: isLeft ? -100 : 100, opacity: 0 },
+    };
+  };
+
   return (
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          initial={{ x: -100, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: -100, opacity: 0 }}
+          {...getAnimationProps()}
           transition={{ type: "spring", damping: 20, stiffness: 300 }}
-          className="fixed bottom-6 left-6 z-50 max-w-xs"
+          className={`fixed z-50 max-w-xs ${getPositionClasses()}`}
         >
           <Link
             to={`/products/${currentProduct.slug}`}

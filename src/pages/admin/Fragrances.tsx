@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
-import { categories, genderOptions } from "@/data/products";
+import { genderOptions } from "@/models/product";
 import { useFragrancesViewModel } from "@/viewmodels/fragrancesViewModel";
 import { Fragrance, ProductVariant } from "@/models/fragrance";
 
@@ -83,62 +83,137 @@ const Fragrances = () => {
   };
 
 const handleSave = () => {
-  // Ensure images
-  const allImages = [formData.images?.[0] || "", ...additionalImages].filter(Boolean);
+  // Combine primary + additional images
+  const allImages = [
+    formData.images?.[0] || "",
+    ...additionalImages,
+  ].filter(Boolean);
 
-  // Ensure concentration and notes exist
-  const safeFormData: Fragrance = {
-    ...formData,
-    images: allImages,
+  // Build normalized product_images
+  const product_images = allImages.length
+    ? [
+        {
+          image: allImages[0],
+          images: allImages.slice(1),
+        },
+      ]
+    : [];
+
+  const safeFormData: Partial<Fragrance> = {
+    name: formData.name || "Untitled Product",
+    sku: formData.sku || "",
+    type: formData.type || "perfume",
+    gender: formData.gender || "unisex",
+    category: formData.category || "Floral",
+
+    product_images,
+
     notes: {
       top: formData.notes?.top || [],
       heart: formData.notes?.heart || [],
       base: formData.notes?.base || [],
     },
+
+    description: formData.description || "",
+    occasion: formData.occasion || "",
+    tag: formData.tag,
+
     concentration: {
       sillage: formData.concentration?.sillage ?? 50,
       projection: formData.concentration?.projection ?? 50,
       longevity: formData.concentration?.longevity ?? 50,
     },
-    variants: formData.variants?.map(v => ({
-      size: v.size,
-      mrp: v.mrp || 0,
-      discount: v.discount || 0,
-      price: v.price || Math.round((v.mrp || 0) * (1 - (v.discount || 0) / 100)),
-    })) || [],
-    isActive: formData.isActive ?? true,
-    category: formData.category || "Floral",
-    gender: formData.gender || "unisex",
-    type: formData.type || "perfume",
-    sku: formData.sku || "",
+
+    variants:
+      formData.variants?.map(v => ({
+        size: v.size,
+        mrp: Number(v.mrp) || 0,
+        discount: Number(v.discount) || 0,
+        price:
+          Number(v.price) ||
+          Math.round((Number(v.mrp) || 0) * (1 - (Number(v.discount) || 0) / 100)),
+      })) || [],
+
     maxOrderThreshold: formData.maxOrderThreshold || 5,
     stockID: formData.stockID || 0,
-    tag: formData.tag,
-    description: formData.description || "",
-    occasion: formData.occasion || "",
+    isActive: formData.isActive ?? true,
   };
 
-  // Save using ViewModel
+  /**
+   * ✅ Single save function
+   * - id present → UPDATE
+   * - id absent → CREATE
+   */
   saveFragrance(safeFormData, editingProduct?.id);
 
-  // Close dialog
+  // UI cleanup
   setIsDialogOpen(false);
-
-  // Reset editing
   setEditingProduct(null);
 };
 
 
-  const handleEdit = (product: Fragrance) => {
-    setEditingProduct(product);
-    setFormData({ ...product });
-    setAdditionalImages([
-      product.images?.[1] || "",
-      product.images?.[2] || "",
-      product.images?.[3] || "",
-    ]);
-    setIsDialogOpen(true);
-  };
+ const handleEdit = (product: Fragrance) => {
+   setFormData({
+     name: product.name || "",
+     images: [product.product_images?.[0]?.image || ""],
+     gender: product.gender || "unisex",
+     category: product.category || "Floral",
+     type: product.type || "perfume",
+     sku: product.sku || "",
+     maxOrderThreshold: product.maxOrderThreshold || 5,
+     stockID: product.stockID || 50,
+     isActive: product.isActive ?? true,
+     notes: product.notes || { top: [], heart: [], base: [] },
+     description: product.description || "",
+     occasion: product.occasion || "",
+     concentration: product.concentration || { sillage: 50, projection: 50, longevity: 50 },
+     variants: product.variants?.map(v => ({
+       size: v.size,
+       mrp: v.mrp || 0,
+       discount: v.discount || 0,
+       price: v.price || Math.round((v.mrp || 0) * (1 - (v.discount || 0) / 100)),
+     })) || [],
+     tag: product.tag,
+   });
+
+   setAdditionalImages([
+     product.product_images?.[0]?.images?.[0] || "",
+     product.product_images?.[0]?.images?.[1] || "",
+     product.product_images?.[0]?.images?.[2] || "",
+   ]);
+
+   setEditingProduct(product);
+   setIsDialogOpen(true);
+ };
+
+
+// --- Reset Form Function ---
+const resetForm = () => {
+  setFormData({
+    name: "",
+    images: [""],
+    gender: "unisex",
+    category: "Floral",
+    type: "perfume",
+    sku: "",
+    maxOrderThreshold: 5,
+    stockID: 50,
+    isActive: true,
+    notes: { top: [], heart: [], base: [] },
+    description: "",
+    occasion: "",
+    concentration: { sillage: 50, projection: 50, longevity: 50 },
+    variants: [
+      { size: "8ml", mrp: 0, discount: 0, price: 0 },
+      { size: "50ml", mrp: 0, discount: 0, price: 0 },
+      { size: "100ml", mrp: 0, discount: 0, price: 0 },
+    ],
+    tag: undefined,
+  });
+
+  setAdditionalImages(["", "", ""]);
+  setEditingProduct(null);
+};
 
   return (
     <div className="space-y-6 p-6">
@@ -146,7 +221,7 @@ const handleSave = () => {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-serif font-semibold">Fragrances</h1>
         <Button
-          onClick={() => { setEditingProduct(null); setIsDialogOpen(true); }}
+          onClick={() => {  resetForm();  setEditingProduct(null); setIsDialogOpen(true); }}
           className="gap-2"
         >
           <Plus className="w-4 h-4" /> Add New Product
@@ -222,7 +297,8 @@ const handleSave = () => {
             <tbody>
               {paginatedProducts.map((product) => (
                 <tr key={product.id} className="border-b hover:bg-muted/30 transition-colors">
-                  <td className="p-4"><img src={product.images?.[0]} className="w-10 h-10 rounded object-cover" /></td>
+                  <td className="p-4">
+                  <img src={product.product_images?.[0]?.image} className="w-10 h-10 rounded object-cover" /></td>
                   <td className="p-4 font-medium">{product.name}</td>
                   <td className="p-4 font-mono text-xs">{product.sku}</td>
                   <td className="p-4">{product.tag && <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">{product.tag}</Badge>}</td>
@@ -482,7 +558,8 @@ const handleSave = () => {
                       placeholder={noteType === "heart" ? "Heart Notes" : `${noteType.charAt(0).toUpperCase() + noteType.slice(1)} Notes`}
                       value={formData.notes?.[noteType as keyof typeof formData.notes]?.join(", ") || ""}
                       onChange={(e) => {
-                        const newNotes = { ...formData.notes } || { top: [], heart: [], base: [] };
+                        const existingNotes = formData.notes || { top: [], heart: [], base: [] };
+                        const newNotes = { ...existingNotes };
                         newNotes[noteType as keyof typeof newNotes] = e.target.value.split(",").map((n) => n.trim());
                         setFormData({ ...formData, notes: newNotes });
                       }}

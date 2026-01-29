@@ -33,6 +33,7 @@ urlpatterns = [
         path('assets/', include('apps.assets.urls')),
         path('analytics/', include('apps.analytics.urls')),
         path('notifications/', include('apps.notifications.urls')),
+        path('accessories/', include('apps.accessories.urls')),
     ])),
     
     # API Documentation
