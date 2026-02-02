@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
-import { allProducts, Product } from "@/data/products";
+import { allProducts } from "@/data/products";
 import { productRepository, FrontendProduct } from "@/repositories/productRepository";
 
 interface CustomerAlsoLoveProps {
@@ -41,12 +41,34 @@ const CustomerAlsoLove = ({ currentProductSlug, currentProductCategory }: Custom
     fetchProducts();
   }, [currentProductSlug, currentProductCategory]);
 
+  // Convert to common product format
+  const toProductFormat = (p: FrontendProduct) => ({
+    id: String(p.id),
+    name: p.name,
+    price: p.price,
+    originalPrice: p.originalPrice,
+    image: p.image,
+    tag: p.tag,
+    slug: p.slug,
+    category: p.category,
+  });
+
   // Use API products or fallback to static data
   const relatedProducts = apiProducts.length > 0
-    ? apiProducts
+    ? apiProducts.map(toProductFormat)
     : allProducts
         .filter(p => p.slug !== currentProductSlug)
-        .slice(0, 8);
+        .slice(0, 8)
+        .map(p => ({
+          id: p.id,
+          name: p.name,
+          price: p.price,
+          originalPrice: p.originalPrice,
+          image: p.image,
+          tag: p.tag,
+          slug: p.slug,
+          category: p.category,
+        }));
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
@@ -56,29 +78,6 @@ const CustomerAlsoLove = ({ currentProductSlug, currentProductCategory }: Custom
         behavior: "smooth",
       });
     }
-  };
-
-  // Convert FrontendProduct to format expected by ProductCard
-  const toProductCardFormat = (product: FrontendProduct | Product): Product => {
-    if ('images' in product && Array.isArray(product.images)) {
-      return product as Product;
-    }
-    return {
-      id: product.id,
-      name: product.name,
-      slug: product.slug,
-      price: product.price,
-      originalPrice: product.originalPrice,
-      image: product.image,
-      images: (product as any).images || [product.image],
-      tag: product.tag,
-      gender: product.gender,
-      category: product.category,
-      notes: product.notes || { top: [], middle: [], base: [] },
-      description: product.description || "",
-      occasion: product.occasion || "",
-      concentration: product.concentration || { sillage: 50, projection: 50, longevity: 50 },
-    };
   };
 
   return (
@@ -110,7 +109,7 @@ const CustomerAlsoLove = ({ currentProductSlug, currentProductCategory }: Custom
       >
         {relatedProducts.map((product) => (
           <div key={product.id} className="flex-shrink-0 w-[260px]">
-            <ProductCard product={toProductCardFormat(product)} />
+            <ProductCard product={product} />
           </div>
         ))}
       </div>

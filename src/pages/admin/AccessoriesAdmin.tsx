@@ -113,12 +113,12 @@ const AccessoriesAdmin = () => {
 
   const handleDelete = (accessory: Accessory) => {
     if (confirm("Are you sure you want to delete this accessory?")) {
-      deleteAccessory(accessory.slug);
+      deleteAccessory(accessory.id);
     }
   };
 
   const handleToggleActive = (accessory: Accessory) => {
-    saveAccessory({ ...accessory, isActive: !accessory.isActive }, accessory.slug);
+    saveAccessory({ ...accessory, isActive: !accessory.isActive }, accessory.id);
   };
 
   const handleSave = async () => {
@@ -130,7 +130,7 @@ const AccessoriesAdmin = () => {
       image: allImages[0] || "",
     };
     
-    await saveAccessory(dataToSave, editingAccessory?.slug);
+    await saveAccessory(dataToSave, editingAccessory?.id);
     setIsDialogOpen(false);
   };
 

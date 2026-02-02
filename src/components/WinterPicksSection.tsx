@@ -39,10 +39,18 @@ const winterPicks = [
 
 const AUTO_SCROLL_DELAY = 3000;
 
+interface CarouselProduct {
+  id: string;
+  name: string;
+  slug: string;
+  price: number;
+  image: string;
+}
+
 const WinterPicksSection = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isHovered = useRef(false);
-  const [apiProducts, setApiProducts] = useState<FrontendProduct[]>([]);
+  const [apiProducts, setApiProducts] = useState<CarouselProduct[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
 
   // Fetch products from API
@@ -51,7 +59,13 @@ const WinterPicksSection = () => {
       try {
         const data = await productRepository.list();
         if (data.length > 0) {
-          setApiProducts(data.slice(0, 4));
+          setApiProducts(data.slice(0, 4).map(p => ({
+            id: String(p.id),
+            name: p.name,
+            slug: p.slug,
+            price: p.price,
+            image: p.image,
+          })));
         }
       } catch (err) {
         console.error("Failed to fetch products for winter picks:", err);
@@ -61,9 +75,15 @@ const WinterPicksSection = () => {
   }, []);
 
   // Use API products or fallback
-  const featuredProducts = apiProducts.length > 0 
+  const featuredProducts: CarouselProduct[] = apiProducts.length > 0 
     ? apiProducts 
-    : allProducts.slice(0, 4);
+    : allProducts.slice(0, 4).map(p => ({
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        price: p.price,
+        image: p.image,
+      }));
 
   // 🔁 Auto-scroll
   useEffect(() => {
