@@ -42,7 +42,7 @@ const SocialProofAdmin = () => {
           if (!saved) {
             setSettings(prev => ({
               ...prev,
-              selectedProductIds: data.slice(0, 5).map(p => p.id),
+              selectedProductIds: data.slice(0, 5).map(p => String(p.id)),
             }));
           }
         } else {
@@ -58,10 +58,6 @@ const SocialProofAdmin = () => {
             tag: p.tag,
             gender: p.gender,
             category: p.category,
-            notes: p.notes,
-            description: p.description,
-            occasion: p.occasion,
-            concentration: p.concentration,
           })));
         }
       } catch (err) {
@@ -78,10 +74,6 @@ const SocialProofAdmin = () => {
           tag: p.tag,
           gender: p.gender,
           category: p.category,
-          notes: p.notes,
-          description: p.description,
-          occasion: p.occasion,
-          concentration: p.concentration,
         })));
       }
     };
@@ -121,7 +113,7 @@ const SocialProofAdmin = () => {
   const selectAll = () => {
     setSettings(prev => ({
       ...prev,
-      selectedProductIds: products.map(p => p.id),
+      selectedProductIds: products.map(p => String(p.id)),
     }));
   };
 
@@ -288,30 +280,33 @@ const SocialProofAdmin = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96 overflow-y-auto">
-            {filteredProducts.map((product) => (
-              <label
-                key={product.id}
-                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                  settings.selectedProductIds.includes(product.id)
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:border-primary/50"
-                }`}
-              >
-                <Checkbox
-                  checked={settings.selectedProductIds.includes(product.id)}
-                  onCheckedChange={() => toggleProduct(product.id)}
-                />
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-10 h-10 rounded object-cover"
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{product.name}</p>
-                  <p className="text-xs text-muted-foreground">₹{product.price}</p>
-                </div>
-              </label>
-            ))}
+            {filteredProducts.map((product) => {
+              const productIdStr = String(product.id);
+              return (
+                <label
+                  key={product.id}
+                  className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                    settings.selectedProductIds.includes(productIdStr)
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <Checkbox
+                    checked={settings.selectedProductIds.includes(productIdStr)}
+                    onCheckedChange={() => toggleProduct(productIdStr)}
+                  />
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-10 h-10 rounded object-cover"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{product.name}</p>
+                    <p className="text-xs text-muted-foreground">₹{product.price}</p>
+                  </div>
+                </label>
+              );
+            })}
           </div>
         </CardContent>
       </Card>

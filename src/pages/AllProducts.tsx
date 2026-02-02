@@ -83,15 +83,25 @@ const AllProducts = () => {
     }
   }, [genderFromUrl, categoryFromUrl]);
 
-  // Use API products or fallback
+  // Use API products or fallback - normalize all to string IDs
   const allProducts: Product[] = useMemo(() => {
     if (apiProducts.length > 0) {
       return apiProducts.map(p => ({
-        ...p,
-        notes: p.notes || { top: [], middle: [], base: [] },
+        id: String(p.id),
+        name: p.name,
+        slug: p.slug,
+        price: p.price,
+        originalPrice: p.originalPrice,
+        image: p.image,
+        images: p.images || [p.image],
+        tag: p.tag,
+        gender: (p.gender as "for-him" | "for-her" | "unisex") || "unisex",
+        category: p.category || "",
+        type: (p.type as "perfume" | "attar") || "perfume",
+        notes: { top: [], middle: [], base: [] },
         description: p.description || "",
-        occasion: p.occasion || "",
-        concentration: p.concentration || { sillage: 50, projection: 50, longevity: 50 },
+        occasion: "",
+        concentration: { sillage: 50, projection: 50, longevity: 50 },
       }));
     }
     return fallbackProducts;

@@ -58,7 +58,7 @@ export const fragranceRepository = {
   // UPDATE
   // =============================
   update: async (
-    id: string,
+    id: number | string,
     data: Partial<Fragrance>
   ): Promise<Fragrance | null> => {
     const payload = transformFragranceToApi(data);
@@ -78,7 +78,7 @@ export const fragranceRepository = {
   // =============================
   // DELETE
   // =============================
-  delete: async (id: string): Promise<boolean> => {
+  delete: async (id: number | string): Promise<boolean> => {
     const res = await apiRequest(API_ENDPOINTS.fragrances.delete(id), {
       method: "DELETE",
     });

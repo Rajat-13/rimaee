@@ -1,4 +1,4 @@
-// src/models/Product.ts
+// src/models/product.ts
 
 export interface ProductVariant {
   size: "8ml" | "50ml" | "100ml";
