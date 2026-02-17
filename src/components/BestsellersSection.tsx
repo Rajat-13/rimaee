@@ -135,10 +135,10 @@ const BestsellersSection = () => {
               </div>
             ) : (
               <div
-                className="flex justify-center min-h-[450px]"
+                className="flex items-center justify-center min-h-[450px]"
                 style={{ perspective: "1200px" }}
               >
-                <div style={{ transformStyle: "preserve-3d" }}>
+                <div className="relative" style={{ transformStyle: "preserve-3d" }}>
                   {products.map((product, index) => {
                     const slug =
                       product.slug ||
